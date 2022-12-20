@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:prenotazioni/booking.dart';
 
-import 'history.dart';
-import 'catalogue.dart';
-
+import 'package:prenotazioni/pages/history.dart';
+import 'package:prenotazioni/pages/catalogue.dart';
+import 'package:prenotazioni/pages/booking.dart';
 import 'package:prenotazioni/model/utente.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage(this.user, {Key? key}) : super(key: key);
+
+  final Utente user;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -24,8 +25,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final Utente user = ModalRoute.of(context)!.settings.arguments as Utente;
-    List<Widget> options = [CataloguePage(), HistoryPage(user)];
+    List<Widget> options = [CataloguePage(), HistoryPage(widget.user)];
 
     return Scaffold(
       appBar: AppBar(
@@ -57,12 +57,12 @@ class _HomePageState extends State<HomePage> {
         onTap: _onItemTapped,
       ),
       floatingActionButton: Visibility(
-        visible: user.ruolo == 'studente',
+        visible: widget.user.ruolo == 'studente',
         child: FloatingActionButton.extended(
           onPressed: () => {
             Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => BookingPage(user: user))
+                MaterialPageRoute(builder: (context) => BookingPage(widget.user))
             )
           },
           label: Text('Prenota'),

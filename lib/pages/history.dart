@@ -5,36 +5,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:prenotazioni/model/utente.dart';
 import 'package:prenotazioni/model/prenotazione.dart';
-import 'util/appointment_list.dart';
-
-List<Prenotazione> _getDummyAppointments() {
-  return <Prenotazione>[
-    Prenotazione(
-        utente: 'heymehdi',
-        corso: 'Matematica',
-        docente: 'Ciro Amato',
-        data: 'Lunedì',
-        fasciaOraria: '15:00 - 16:00',
-        attiva: true,
-        effettuata: true),
-    Prenotazione(
-        utente: 'heymehdi',
-        corso: 'Musica',
-        docente: 'Antonello Perdonò',
-        data: 'Venerdì',
-        fasciaOraria: '18:00 - 19:00',
-        attiva: false,
-        effettuata: false),
-    Prenotazione(
-        utente: 'heymehdi',
-        corso: 'Scienze',
-        docente: 'Niccolò Spappalardo',
-        data: 'Mercoledì',
-        fasciaOraria: '16:00 - 17:00',
-        attiva: true,
-        effettuata: false)
-  ];
-}
+import '../util/appointment_list.dart';
 
 const Map<String, String> _appointmentURL = {
   'studente': 'ottieniPrenotazioniUtente',
@@ -42,10 +13,13 @@ const Map<String, String> _appointmentURL = {
 };
 
 Future<List<Prenotazione>> _fetchAppointments(Utente user) async {
+  String appointmentsURL = _appointmentURL[user.ruolo]!;
+  if(user.ruolo == 'studente') {
+    appointmentsURL += '&utente=${user.username}';
+  }
+
   final response = await http.get(Uri.parse(
-      'http://localhost:3036/progetto_TWeb_war_exploded/prenotazioni?action=ottieniPrenotazioniUtente' +
-          '&utente=' +
-          user.username));
+      'http://localhost:3036/progetto_TWeb_war_exploded/prenotazioni?action=$appointmentsURL'));
 
   return _parseAppointments(response.body);
 }

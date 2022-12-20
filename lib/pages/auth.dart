@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:prenotazioni/home.dart';
-import 'package:prenotazioni/login.dart';
 import 'package:prenotazioni/model/utente.dart';
+
+import 'package:prenotazioni/pages/home.dart';
+import 'package:prenotazioni/pages/login.dart';
 
 class AuthPage extends StatelessWidget {
   AuthPage({Key? key}) : super(key: key);
