@@ -20,6 +20,7 @@ class _LoginFormState extends State<LoginForm> {
   final _passwordInput = TextEditingController();
 
   Future<Utente> _authenticateUser() async {
+    /* Mostro schermata di caricamento */
     showDialog(
         context: context,
         builder: (context) {
@@ -44,9 +45,7 @@ class _LoginFormState extends State<LoginForm> {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     _prefs.setString('current-user', userData);
 
-    /* Parsing della risposta da JSON a oggetto di tipo Utente */
-    Utente res = _parseUserData(userData);
-    return res;
+    return _parseUserData(userData);
   }
 
   Utente _parseUserData(String responseBody) {
@@ -91,6 +90,7 @@ class _LoginFormState extends State<LoginForm> {
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   _authenticateUser();
+                  Navigator.pushReplacementNamed(context, '/auth');
                 }
               },
               child: const Text('Accedi')
