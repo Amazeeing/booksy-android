@@ -7,35 +7,6 @@ import 'package:prenotazioni/model/utente.dart';
 import 'package:prenotazioni/model/prenotazione.dart';
 import 'package:prenotazioni/util/appointment_list.dart';
 
-List<Prenotazione> _getDummyAppointments() {
-  return <Prenotazione>[
-    Prenotazione(
-        utente: 'elmehdiamlal',
-        corso: 'Matematica',
-        docente: 'Ciro Amato',
-        data: 'Lunedì',
-        fasciaOraria: '15-16',
-        attiva: true,
-        effettuata: true),
-    Prenotazione(
-        utente: 'elmehdiamlal',
-        corso: 'Musica',
-        docente: 'Antonello Perdonò',
-        data: 'Venerdì',
-        fasciaOraria: '18-19',
-        attiva: false,
-        effettuata: false),
-    Prenotazione(
-        utente: 'elmehdiamlal',
-        corso: 'Scienze',
-        docente: 'Niccolò Spappalardo',
-        data: 'Mercoledì',
-        fasciaOraria: '16-17',
-        attiva: true,
-        effettuata: false)
-  ];
-}
-
 Future<List<Prenotazione>> _fetchAvailableSlots() async {
   /* Chiamata HTTP che ottiene le prenotazioni disponibili */
   final response = await http.get(Uri.parse('localhost' /* sostituire con URL servlet */));
