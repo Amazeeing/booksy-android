@@ -1,55 +1,35 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:prenotazioni/home.dart';
+import 'package:prenotazioni/login.dart';
 import 'package:prenotazioni/model/utente.dart';
 
 class AuthPage extends StatelessWidget {
-  AuthPage(this.username, this.password, {Key? key}) : super(key: key);
+  AuthPage({Key? key}) : super(key: key);
 
-  final String username, password;
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
-  Future<Utente> _authenticateUser() async {
-    /* Chiamata HTTP per ottenere l'autenticazione dell'utente */
-    final response = await http.get(Uri.parse(
-        'http://localhost:3036/progetto_TWeb_war_exploded/autentica?action=autenticaUtente' +
-        '&username=$username&password=$password'));
+  Future<Utente?> _getLoggedUser() async {
+    final SharedPreferences prefs = await _prefs;
+    String userData = prefs.getString('current_user')!;
 
-    return _parseUserData(response.body);
-  }
-
-  Utente _parseUserData(String responseBody) {
-    final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
-
-    return parsed.map<Utente>((json) => Utente.fromJson(json)).toList();
+    Utente user = jsonDecode(userData) as Utente;
+    return user;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<Utente>(
-        future: _authenticateUser(),
+      body: FutureBuilder<Utente?>(
+        future: _getLoggedUser(),
         builder: (context, snapshot) {
-          if(snapshot.hasError) {
-            return AlertDialog(
-              icon: const Icon(Icons.cloud_off),
-              title: const Text('Booksy è offline'),
-              content: const Text('Per favore riprova più tardi.'),
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text('OK')
-                )
-              ],
-            );
-          } else if(snapshot.hasData) {
-            Navigator.pushReplacementNamed(context, '/home');
-            return const Placeholder();
+          if(snapshot.hasData) {
+            return HomePage(snapshot.data!);
           } else {
-            return const Center(
-                child: CircularProgressIndicator()
-            );
+            return const LoginPage();
           }
         }
       ),

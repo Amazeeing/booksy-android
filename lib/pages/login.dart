@@ -1,6 +1,10 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-import 'auth.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:prenotazioni/model/utente.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
@@ -15,12 +19,47 @@ class _LoginFormState extends State<LoginForm> {
   final _usernameInput = TextEditingController();
   final _passwordInput = TextEditingController();
 
+  Future<Utente> _authenticateUser() async {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+    );
+
+    /* Ottenimento dei dati inseriti nel form */
+    String username, password;
+    username = _usernameInput.text;
+    password = _passwordInput.text;
+
+    /* Chiamata HTTP per ottenere l'autenticazione dell'utente */
+    final response = await http.get(Uri.parse(
+        'http://localhost:3036/progetto_TWeb_war_exploded/autentica?action=autenticaUtente'
+            '&username=$username&password=$password'));
+    String userData = response.body;
+
+    /* Ottenimento della cache locale e scrittura dell'utente per aperture future dell'app */
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    _prefs.setString('current-user', userData);
+
+    /* Parsing della risposta da JSON a oggetto di tipo Utente */
+    Utente res = _parseUserData(userData);
+    return res;
+  }
+
+  Utente _parseUserData(String responseBody) {
+    Map<String, dynamic> parsed = jsonDecode(responseBody);
+
+    return Utente.fromJson(parsed);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           TextFormField(
             decoration: const InputDecoration(
@@ -51,11 +90,7 @@ class _LoginFormState extends State<LoginForm> {
           ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (context) => AuthPage(_usernameInput.text, _passwordInput.text)
-                    )
-                  );
+                  _authenticateUser();
                 }
               },
               child: const Text('Accedi')
@@ -89,8 +124,18 @@ class LoginPage extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         minimum: const EdgeInsets.symmetric(vertical: 100.0, horizontal: 125.0),
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
           Image.asset('assets/logo.png', fit: BoxFit.contain),
+          const SizedBox(height: 20.0),
+          const Text(
+            'Dai un boost alla tua carriera universitaria 🚀',
+            maxLines: 2,
+            textScaleFactor: 1.5,
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(height: 100.0),
           const Text(
             'Effettua l\'accesso',
