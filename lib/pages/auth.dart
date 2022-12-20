@@ -9,12 +9,10 @@ import 'package:prenotazioni/pages/home.dart';
 import 'package:prenotazioni/pages/login.dart';
 
 class AuthPage extends StatelessWidget {
-  AuthPage({Key? key}) : super(key: key);
-
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  const AuthPage({Key? key}) : super(key: key);
 
   Future<Utente?> _getLoggedUser() async {
-    final SharedPreferences prefs = await _prefs;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     String userData = prefs.getString('current_user')!;
 
     Utente user = jsonDecode(userData) as Utente;
