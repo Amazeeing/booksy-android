@@ -15,10 +15,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
 
   @override
   Widget build(BuildContext context) {
-    String statusText = widget.current.attiva!
-        ? 'Attiva'
-        : widget.current.effettuata!
-          ? 'Effettuata'
+    String statusText = widget.current.effettuata!
+        ? 'Effettuata'
+        : widget.current.attiva!
+          ? 'Attiva'
           : 'Annullata';
 
     const Map<String, Color> statusColor = {
@@ -29,7 +29,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
 
     Widget appointmentStatus = Text(
       statusText,
-      textScaleFactor: 0.75,
+      textScaleFactor: 0.9,
       style: TextStyle(color: statusColor[statusText]),
     );
 
