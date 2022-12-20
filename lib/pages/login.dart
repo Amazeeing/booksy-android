@@ -1,10 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:prenotazioni/model/utente.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
@@ -19,7 +14,7 @@ class _LoginFormState extends State<LoginForm> {
   final _usernameInput = TextEditingController();
   final _passwordInput = TextEditingController();
 
-  Future<Utente> _authenticateUser() async {
+  void _saveCredentials() async {
     /* Mostro schermata di caricamento */
     showDialog(
         context: context,
@@ -35,23 +30,10 @@ class _LoginFormState extends State<LoginForm> {
     username = _usernameInput.text;
     password = _passwordInput.text;
 
-    /* Chiamata HTTP per ottenere l'autenticazione dell'utente */
-    final response = await http.get(Uri.parse(
-        'http://localhost:3036/progetto_TWeb_war_exploded/autentica?action=autenticaUtente'
-            '&username=$username&password=$password'));
-    String userData = response.body;
-
-    /* Ottenimento della cache locale e scrittura dell'utente per aperture future dell'app */
-    SharedPreferences _prefs = await SharedPreferences.getInstance();
-    _prefs.setString('current-user', userData);
-
-    return _parseUserData(userData);
-  }
-
-  Utente _parseUserData(String responseBody) {
-    Map<String, dynamic> parsed = jsonDecode(responseBody);
-
-    return Utente.fromJson(parsed);
+    /* Ottenimento della cache locale e scrittura delle credenziali per aperture future dell'app */
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('username', username);
+    prefs.setString('password', password);
   }
 
   @override
@@ -89,7 +71,7 @@ class _LoginFormState extends State<LoginForm> {
           ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  _authenticateUser();
+                  _saveCredentials();
                   Navigator.pushReplacementNamed(context, '/auth');
                 }
               },
