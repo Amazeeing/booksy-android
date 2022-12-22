@@ -3,23 +3,61 @@ import 'package:flutter/material.dart';
 import 'package:prenotazioni/model/prenotazione.dart';
 
 class AppointmentCard extends StatefulWidget {
-  const AppointmentCard({Key? key, required this.current}) : super(key: key);
+  const AppointmentCard(this.current, this.userRole, {Key? key})
+      : super(key: key);
 
   final Prenotazione current;
+  final String userRole;
 
   @override
   State<AppointmentCard> createState() => _AppointmentCardState();
 }
 
 class _AppointmentCardState extends State<AppointmentCard> {
+  List<PopupMenuItem<String>> _getPopUpMenuEntries() {
+    List<PopupMenuItem<String>> entries = [
+      PopupMenuItem<String>(
+          value: 'Annulla',
+          child: Row(children: const [
+            Icon(Icons.close, color: Colors.red),
+            SizedBox(width: 10.0),
+            Text('Annulla')
+          ]),
+          onTap: () => setState(() {
+            widget.current.setCancelled();
+          })
+      )
+    ];
+
+    if(widget.userRole == 'studente') {
+      entries.insert(0,
+        PopupMenuItem<String>(
+            value: 'Effettua',
+            enabled: widget.userRole == 'studente',
+            child: Row(
+              children: const [
+                Icon(Icons.check, color: Colors.green),
+                SizedBox(width: 10.0),
+                Text('Effettua')
+              ],
+            ),
+            onTap: () => setState(() {
+              widget.current.setAppointed();
+            })
+        )
+      );
+    }
+
+    return entries;
+  }
 
   @override
   Widget build(BuildContext context) {
     String statusText = widget.current.effettuata!
         ? 'Effettuata'
         : widget.current.attiva!
-          ? 'Attiva'
-          : 'Annullata';
+            ? 'Attiva'
+            : 'Annullata';
 
     const Map<String, Color> statusColor = {
       'Attiva': Colors.blue,
@@ -37,38 +75,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
         offset: const Offset(-5.0, 5.0),
         icon: const Icon(Icons.more_vert),
         elevation: 5.0,
-        itemBuilder: (context) => <PopupMenuEntry<String>>[
-
-          /* Opzione disponibile solo per gli utenti */
-          PopupMenuItem<String>(
-              value: 'Effettua',
-              child: Row(
-                children: const [
-                  Icon(Icons.check, color: Colors.green),
-                  SizedBox(width: 10.0),
-                  Text('Effettua')
-                ],
-              ),
-              onTap: () => setState(() {
-                widget.current.setAppointed();
-              }),
-            ),
-          /* Opzione disponibile per utenti ed amministratori */
-          PopupMenuItem<String>(
-              value: 'Annulla',
-              child: Row(
-                  children: const [
-                    Icon(Icons.close, color: Colors.red),
-                    SizedBox(width: 10.0),
-                    Text('Annulla')
-                  ]
-              ),
-              onTap: () => setState(() {
-                widget.current.setCancelled();
-              }),
-            )
-        ]
-    );
+        itemBuilder: (context) => _getPopUpMenuEntries());
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -76,10 +83,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: GridTile(
-          footer: Align(
-            alignment: Alignment.bottomRight,
-              child: appointmentStatus
-          ),
+          footer:
+              Align(alignment: Alignment.bottomRight, child: appointmentStatus),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -94,9 +99,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                 ],
               ),
               const SizedBox(height: 20.0),
-              Text(
-                widget.current.corso
-              ),
+              Text(widget.current.corso),
               const SizedBox(height: 20.0),
               Row(
                 children: [
@@ -118,9 +121,11 @@ class _AppointmentCardState extends State<AppointmentCard> {
 }
 
 class AppointmentsList extends StatelessWidget {
-  const AppointmentsList(this.appointments, {Key? key}) : super(key: key);
+  const AppointmentsList(this.appointments, this.userRole, {Key? key})
+      : super(key: key);
 
   final List<Prenotazione> appointments;
+  final String userRole;
 
   @override
   Widget build(BuildContext context) {
@@ -138,15 +143,12 @@ class AppointmentsList extends StatelessWidget {
     return GridView.builder(
       itemCount: appointments.length,
       itemBuilder: (context, index) {
-        return AppointmentCard(
-          current: appointments[index],
-        );
+        return AppointmentCard(appointments[index], userRole);
       },
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 500.0,
           mainAxisSpacing: 20.0,
-          crossAxisSpacing: 20.0
-      ),
+          crossAxisSpacing: 20.0),
     );
   }
 }
