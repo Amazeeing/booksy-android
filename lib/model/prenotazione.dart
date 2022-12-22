@@ -46,10 +46,12 @@ class Prenotazione {
     'effettuata': effettuata
   };
 
-  void _setAppointedDB() async {
+  Future<bool> _setAppointedDB() async {
       final response = await http.post(
-          Uri.parse('http://localhost:3036/progetto_TWeb_war_exploded/prenotazioni?action=impostaPrenotazioneEffettuata' +
+          Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/prenotazioni?action=impostaPrenotazioneEffettuata' +
                     '&emailDocente=$docente&data=$data&fasciaOraria=$fasciaOraria'));
+
+      return response.statusCode == 200;
   }
 
   void setAppointed() {
@@ -59,10 +61,12 @@ class Prenotazione {
     _setAppointedDB();
   }
 
-  void _setCancelledDB() async {
+  Future<bool> _setCancelledDB() async {
     final response = await http.post(
-        Uri.parse('http://localhost:3036/progetto_TWeb_war_exploded/prenotazioni?action=rimuoviPrenotazioni' +
+        Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/prenotazioni?action=rimuoviPrenotazioni' +
             '&idCorso=$corso&emailDocente=$docente&data=$data&fasciaOraria=$fasciaOraria'));
+
+    return response.statusCode == 200;
   }
 
   void setCancelled() {

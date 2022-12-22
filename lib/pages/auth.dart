@@ -11,7 +11,6 @@ import 'package:prenotazioni/pages/login.dart';
 class AuthPage extends StatelessWidget {
   const AuthPage({Key? key}) : super(key: key);
 
-
   Future<Utente?> _authenticateUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -21,10 +20,11 @@ class AuthPage extends StatelessWidget {
 
     /* Faccio una chiamata HTTP per autenticare l'utente */
     final response = await http.get(Uri.parse(
-        'http://localhost:3036/progetto_TWeb_war_exploded/autentica?action=autenticaUtente'
+        'http://localhost:8080/progetto_TWeb_war_exploded/autentica?action=autenticaUtente'
             '&username=$username&password=$password'));
     String userData = response.body;
 
+    /* Converto la risposta da formato JSON a un oggetto di tipo Utente */
     return _parseUserData(userData);
   }
 
@@ -42,9 +42,18 @@ class AuthPage extends StatelessWidget {
         builder: (context, snapshot) {
           if(snapshot.hasData) {
             return HomePage(snapshot.data!);
-          } else {
-            return const LoginPage();
+          } else if(snapshot.hasError) {
+            showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('Errore durante l\'accesso'),
+                  icon: Icon(Icons.error),
+                  content: Text(snapshot.error.toString()),   // TODO: sostituire con messaggio di errore concreto
+                )
+            );
           }
+
+          return const LoginPage();
         }
       ),
     );

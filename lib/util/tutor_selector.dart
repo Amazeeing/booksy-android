@@ -2,14 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:prenotazioni/model/corso.dart';
 
 import 'package:prenotazioni/model/docente.dart';
 
-Future<List<Docente>> _fetchTutorsByCourse(Corso course) async {
+Future<List<Docente>> _fetchTutorsByCourse(String name) async {
   final response = await http.get(
-      Uri.parse('http://localhost:3036/progetto_TWeb_war_exploded/docenti?action=filtraDocentePerCorso' +
-                '&corso=' + course.nome));
+      Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/docenti?action=filtraDocentePerCorso'
+                '&corso=$name'));
 
   return _parseTutors(response.body);
 }
@@ -22,9 +21,9 @@ List<Docente> _parseTutors(String responseBody) {
 
 
 class TutorSelection extends StatefulWidget {
-  const TutorSelection({this.previousChoice, Key? key}) : super(key: key);
+  TutorSelection(this.fields, {Key? key}) : super(key: key);
 
-  final Corso? previousChoice;
+  Map<String, String> fields;
 
   @override
   State<TutorSelection> createState() => _TutorSelectionState();
@@ -35,12 +34,12 @@ class _TutorSelectionState extends State<TutorSelection> {
 
   @override
   Widget build(BuildContext context) {
-    if(widget.previousChoice == null) {
+    if(widget.fields['course'] == null) {
       return const Text('Nessun corso selezionato.');
     }
 
     return FutureBuilder<List<Docente>>(
-      future: _fetchTutorsByCourse(widget.previousChoice!),
+      future: _fetchTutorsByCourse(widget.fields['course']!),
       builder: (context, snapshot) {
         if(snapshot.hasError) {
           return const Text('Impossibile reperire i corsi disponibili.');
@@ -53,11 +52,12 @@ class _TutorSelectionState extends State<TutorSelection> {
                 items: snapshot.data!.map((docente) {
                   return DropdownMenuItem<Docente>(
                     value: docente,
-                    child: Text(docente.nome),
+                    child: Text(docente.nome + docente.cognome),
                   );
                 }).toList(),
                 onChanged: (Docente? value) {
-                  selected = value!;
+                  selected = value;
+                  widget.fields['tutor'] = value!.email;
                 },
                 decoration: const InputDecoration(
                     border: OutlineInputBorder()

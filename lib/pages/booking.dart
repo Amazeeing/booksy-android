@@ -7,13 +7,13 @@ import 'package:prenotazioni/util/tutor_selector.dart';
 import 'package:prenotazioni/util/date_selection.dart';
 
 class BookingPage extends StatelessWidget {
-  BookingPage(this.user, {Key? key}) : super(key: key);
+  const BookingPage(this.user, {Key? key}) : super(key: key);
 
   final Utente user;
   static Map<String, String> fields = {};
 
   Future<bool> _addAppointment(Map<String, String> fields) async {
-    final response = await http.post(Uri.parse('http://localhost:3036/progetto_TWeb_war_exploded/corsi?action=ottieniCorsi'
+    final response = await http.post(Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/corsi?action=ottieniCorsi'
         '&username=${user.username}&idCorso=${fields['course']}&emailDocente=${fields['tutor']}&data=${fields['date']}&fasciaOraria=${fields['time']}'));
 
     return response.statusCode == 200;
@@ -63,6 +63,7 @@ class BookingPage extends StatelessWidget {
                           const SizedBox(width: 20.0),
                           ElevatedButton(
                               onPressed: () {
+                                _addAppointment(fields);
                                 Navigator.pop(context);
                               },
                               child: const Text('Prenota')

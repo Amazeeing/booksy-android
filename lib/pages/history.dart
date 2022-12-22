@@ -19,7 +19,7 @@ Future<List<Prenotazione>> _fetchAppointments(Utente user) async {
   }
 
   final response = await http.get(Uri.parse(
-      'http://localhost:3036/progetto_TWeb_war_exploded/prenotazioni?action=$appointmentsURL'));
+      'http://localhost:8080/progetto_TWeb_war_exploded/prenotazioni?action=$appointmentsURL'));
 
   return _parseAppointments(response.body);
 }
@@ -58,7 +58,7 @@ class HistoryPage extends StatelessWidget {
                     child: Text('Impossibile reperire le prenotazioni effettuate.'),
                   );
                 } else if (snapshot.hasData) {
-                  return AppointmentsList(snapshot.data!);
+                  return AppointmentsList(snapshot.data!, user.ruolo);
                 } else {
                   return const Center(
                     child: CircularProgressIndicator(),

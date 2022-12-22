@@ -5,15 +5,15 @@ import 'package:http/http.dart' as http;
 
 Future<Map<String, List<String>>> _fetchAvailableSlots() async {
   final response = await http.get(
-      Uri.parse('http://localhost:3036/progetto_TWeb_war_exploded/slot-disponibili?action=ottieniSlotDisponibiliDocente'));
+      Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/slot-disponibili?action=ottieniSlotDisponibiliDocente'));
 
   return _parseAvailableSlots(response.body);
 }
 
-_parseAvailableSlots(String responseBody) {
+Map<String, List<String>> _parseAvailableSlots(String responseBody) {
   Map<String, dynamic> availableSlots = jsonDecode(responseBody);
 
-  // TODO: trovare un modo per fare il parsing della hashmap su Flutter
+  return availableSlots as Map<String, List<String>>;
 }
 
 class DateSelection extends StatefulWidget {

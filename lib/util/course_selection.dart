@@ -7,7 +7,7 @@ import 'package:prenotazioni/model/corso.dart';
 
 Future<List<Corso>> _fetchCourses() async {
   final response = await http.get(
-      Uri.parse('http://localhost:3036/progetto_TWeb_war_exploded/corsi?action=ottieniCorsi'));
+      Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/corsi?action=ottieniCorsi'));
 
   return _parseCourses(response.body);
 }
@@ -19,7 +19,9 @@ List<Corso> _parseCourses(String responseBody) {
 }
 
 class CourseSelection extends StatefulWidget {
-  const CourseSelection({Key? key}) : super(key: key);
+  CourseSelection(this.fields, {Key? key}) : super(key: key);
+
+  Map<String, String> fields;
 
   @override
   State<CourseSelection> createState() => _CourseSelectionState();
@@ -49,6 +51,7 @@ class _CourseSelectionState extends State<CourseSelection> {
                   }).toList(),
                   onChanged: (value) {
                     selected = value;
+                    widget.fields['course'] = value!.nome;
                   },
                   decoration: const InputDecoration(
                       border: OutlineInputBorder()
