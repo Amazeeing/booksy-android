@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:prenotazioni/pages/history.dart';
-import 'package:prenotazioni/pages/catalogue.dart';
 import 'package:prenotazioni/pages/booking.dart';
 import 'package:prenotazioni/model/utente.dart';
+import 'package:prenotazioni/pages/history.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage(this.user, {Key? key}) : super(key: key);
@@ -15,18 +14,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 1;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    List<Widget> options = [CataloguePage(), HistoryPage(widget.user)];
-
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Colors.white,
@@ -37,24 +26,10 @@ class _HomePageState extends State<HomePage> {
           leadingWidth: 100.0
       ),
       body: SafeArea(
-          minimum: const EdgeInsets.all(50.0),
+          minimum: EdgeInsets.all(50.0),
           child: Center(
-            child: options.elementAt(_selectedIndex),
+            child: HistoryPage(widget.user)
           )
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month),
-              label: 'Catalogo'
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.list),
-              label: 'Storico'
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
       ),
       floatingActionButton: Visibility(
         visible: widget.user.ruolo == 'studente',
