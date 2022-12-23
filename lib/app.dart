@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:prenotazioni/pages/auth.dart';
 import 'package:prenotazioni/pages/login.dart';
 import 'package:prenotazioni/pages/register.dart';
-import 'package:prenotazioni/pages/catalogue.dart';
 
 import 'theme.dart';
 
@@ -17,10 +16,9 @@ class AppPrenotazioni extends StatelessWidget {
       theme: booksyTheme,
       initialRoute: '/auth',
       routes: {
-        '/auth': (context) => AuthPage(),
+        '/auth': (context) => const AuthPage(),
         '/login': (context) => const LoginPage(),
-        '/register': (context) => const RegisterPage(),
-        '/catalogue': (context) => const CataloguePage()
+        '/register': (context) => const RegisterPage()
       },
       debugShowCheckedModeBanner: false,
     );
