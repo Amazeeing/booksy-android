@@ -15,16 +15,6 @@ class _LoginFormState extends State<LoginForm> {
   final _passwordInput = TextEditingController();
 
   void _saveCredentials() async {
-    /* Mostro schermata di caricamento */
-    showDialog(
-        context: context,
-        builder: (context) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-    );
-
     /* Ottenimento dei dati inseriti nel form */
     String username, password;
     username = _usernameInput.text;
@@ -47,7 +37,7 @@ class _LoginFormState extends State<LoginForm> {
                 hintText: 'Username', border: OutlineInputBorder()),
             validator: (String? value) {
               if (value == null || value.isEmpty) {
-                return 'Il campo username non può essere vuoto';
+                return 'Il campo username non può essere vuoto.';
               }
 
               return null;
@@ -61,7 +51,7 @@ class _LoginFormState extends State<LoginForm> {
                 hintText: 'Password', border: OutlineInputBorder()),
             validator: (String? value) {
               if (value == null || value.isEmpty) {
-                return 'Il campo password non può essere vuoto';
+                return 'Il campo password non può essere vuoto.';
               }
               return null;
             },
