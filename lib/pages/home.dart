@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:prenotazioni/pages/booking.dart';
 import 'package:prenotazioni/model/utente.dart';
 import 'package:prenotazioni/pages/history.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage(this.user, {Key? key}) : super(key: key);
@@ -16,9 +16,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   void _logUserOut() async {
     await http.post(
-        Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/autentica?action=scollegaUtente'));
+        Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/prenotazioni?action=scollegaUtente'));
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.clear();
@@ -58,7 +59,7 @@ class _HomePageState extends State<HomePage> {
           onPressed: () => {
             Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => BookingPage())
+                MaterialPageRoute(builder: (context) => BookingPage(widget.user))
             )
           },
           label: const Text('Prenota'),
