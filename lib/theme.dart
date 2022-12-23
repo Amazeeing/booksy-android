@@ -22,6 +22,7 @@ ThemeData getBooksyTheme() {
   final ThemeData base = ThemeData.light();
 
   return base.copyWith(
+      primaryColor: const Color.fromRGBO(94, 23, 235, 1.0),
       colorScheme: base.colorScheme.copyWith(
           primary: const Color.fromRGBO(94, 23, 235, 1.0),
           secondary: const Color.fromRGBO(94, 23, 235, 0.7)
