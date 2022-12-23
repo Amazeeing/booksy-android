@@ -19,7 +19,7 @@ class _HomePageState extends State<HomePage> {
 
   void _logUserOut() async {
     await http.post(
-        Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/prenotazioni?action=scollegaUtente'));
+        Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/autentica?action=scollegaUtente'));
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.clear();
