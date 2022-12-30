@@ -5,19 +5,18 @@ import 'package:http/http.dart' as http;
 
 import 'package:prenotazioni/model/utente.dart';
 import 'package:prenotazioni/model/prenotazione.dart';
-import '../util/appointment_list.dart';
+import 'package:prenotazioni/util/common.dart';
+import 'package:prenotazioni/util/appointment_list.dart';
 
 const Map<String, String> _appointmentURL = {
-  'studente': 'ottieniPrenotazioniUtente',
+  'studente': 'ottieniStoricoPrenotazioniUtente',
   'amministratore': 'ottieniPrenotazioniAttive'
 };
 
 Future<List<Prenotazione>> _fetchAppointments(Utente user) async {
-  String appointmentsURL = _appointmentURL[user.ruolo]!;
-  if(user.ruolo == 'studente') {
-    appointmentsURL += '&utente=${user.username}';
-  }
+  authenticateUser();
 
+  String appointmentsURL = _appointmentURL[user.ruolo]!;
   final response = await http.get(Uri.parse(
       'http://localhost:8080/progetto_TWeb_war_exploded/prenotazioni?action=$appointmentsURL'));
 

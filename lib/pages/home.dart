@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:prenotazioni/pages/auth.dart';
 import 'package:prenotazioni/pages/booking.dart';
-import 'package:prenotazioni/model/utente.dart';
 import 'package:prenotazioni/pages/history.dart';
+import 'package:prenotazioni/model/utente.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage(this.user, {Key? key}) : super(key: key);
