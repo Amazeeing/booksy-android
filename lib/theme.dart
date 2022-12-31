@@ -28,7 +28,7 @@ ThemeData getBooksyTheme() {
           secondary: const Color.fromRGBO(94, 23, 235, 0.7)
       ),
       iconTheme: base.iconTheme.copyWith(
-          size: 16.0
+        color: const Color.fromRGBO(94, 23, 235, 0.7),
       ),
       textTheme: _getBooksyTextTheme(base.textTheme)
   );
