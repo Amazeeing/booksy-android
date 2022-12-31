@@ -10,7 +10,7 @@ import 'package:prenotazioni/util/appointment_list.dart';
 
 const Map<String, String> _appointmentURL = {
   'studente': 'ottieniStoricoPrenotazioniUtente',
-  'amministratore': 'ottieniPrenotazioniAttive'
+  'amministratore': 'ottieniTuttePrenotazioni'
 };
 
 Future<List<Prenotazione>> _fetchAppointments(Utente user) async {
@@ -49,21 +49,30 @@ class HistoryPage extends StatelessWidget {
           const Divider(thickness: 2.0),
           const SizedBox(height: 20.0),
           Expanded(
-            child: FutureBuilder<List<Prenotazione>>(
-              future: _fetchAppointments(user),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return const Center(
-                    child: Text('Impossibile reperire le prenotazioni effettuate.'),
-                  );
-                } else if (snapshot.hasData) {
-                  return AppointmentsList(snapshot.data!, user.ruolo);
-                } else {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-              },
+            child: Center(
+              child: FutureBuilder<List<Prenotazione>>(
+                future: _fetchAppointments(user),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.question_mark_sharp, size: 80),
+                        SizedBox(height: 10.0),
+                        Text(
+                          'Impossibile reperire le prenotazioni effettuate.\nRiprova più tardi.',
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    );
+                  } else if (snapshot.hasData) {
+                    return AppointmentsList(snapshot.data!, user.ruolo);
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
+                },
+              ),
             ),
           )
         ]
