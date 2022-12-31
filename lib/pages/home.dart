@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:prenotazioni/pages/auth.dart';
 import 'package:prenotazioni/pages/booking.dart';
 import 'package:prenotazioni/pages/history.dart';
 import 'package:prenotazioni/model/utente.dart';
+import 'package:prenotazioni/util/common.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage(this.user, {Key? key}) : super(key: key);
@@ -19,6 +19,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   void _logUserOut() async {
+    authenticateUser();
+
     await http.post(
         Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/autentica?action=scollegaUtente'));
 
@@ -58,7 +60,7 @@ class _HomePageState extends State<HomePage> {
         visible: widget.user.ruolo == 'studente',
         child: FloatingActionButton.extended(
           onPressed: () => {
-            Navigator.push(
+            Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => BookingPage(widget.user))
             )

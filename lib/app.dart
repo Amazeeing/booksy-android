@@ -14,9 +14,9 @@ class AppPrenotazioni extends StatelessWidget {
     return MaterialApp(
       title: 'Booksy',
       theme: booksyTheme,
-      initialRoute: '/auth',
+      initialRoute: '/',
       routes: {
-        '/auth': (context) => const AuthPage(),
+        '/': (context) => const AuthPage(),
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegisterPage()
       },

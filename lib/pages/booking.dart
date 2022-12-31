@@ -57,14 +57,14 @@ class BookingPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           OutlinedButton(
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () => Navigator.pushReplacementNamed(context, '/'),
                               child: const Text('Annulla')
                           ),
                           const SizedBox(width: 20.0),
                           ElevatedButton(
                               onPressed: () {
                                 _addAppointment(fields);
-                                Navigator.pop(context);
+                                Navigator.pushReplacementNamed(context, '/');
                               },
                               child: const Text('Prenota')
                           )
