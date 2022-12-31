@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:prenotazioni/model/corso.dart';
+import 'package:prenotazioni/util/common.dart';
 
 Future<List<Corso>> _fetchCourses() async {
+  authenticateUser();
+
   final response = await http.get(
       Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/corsi?action=ottieniCorsi'));
 
