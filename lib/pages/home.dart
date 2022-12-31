@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:prenotazioni/pages/welcome.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:prenotazioni/pages/booking.dart';
@@ -17,7 +18,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
+  int _selectedIndex = 0;
+  
   void _logUserOut() async {
     authenticateUser();
 
@@ -30,6 +32,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> pages = [WelcomePage(widget.user), HistoryPage(widget.user)];
+
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Colors.white,
@@ -47,13 +51,14 @@ class _HomePageState extends State<HomePage> {
               _logUserOut();
               Navigator.popAndPushNamed(context, '/login');
             },
+            tooltip: 'Scollegati',
           )
         ],
       ),
       body: SafeArea(
           minimum: const EdgeInsets.all(50.0),
           child: Center(
-            child: HistoryPage(widget.user)
+            child: pages.elementAt(_selectedIndex)
           )
       ),
       floatingActionButton: Visibility(
@@ -68,7 +73,19 @@ class _HomePageState extends State<HomePage> {
           label: const Text('Prenota'),
           icon: const Icon(Icons.add),
         ),
-      )
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Storico')
+        ],
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+      ),
     );
   }
 }
