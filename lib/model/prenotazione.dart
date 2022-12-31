@@ -1,5 +1,7 @@
 import 'package:http/http.dart' as http;
 
+import 'package:prenotazioni/util/common.dart';
+
 class Prenotazione {
   final String utente;
   final String corso;
@@ -47,6 +49,8 @@ class Prenotazione {
   };
 
   Future<void> _setAppointedDB() async {
+    authenticateUser();
+
     http.post(Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/prenotazioni?action=impostaPrenotazioneEffettuata'
                     '&emailDocente=$docente&data=$data&fasciaOraria=$fasciaOraria'));
   }
@@ -59,6 +63,8 @@ class Prenotazione {
   }
 
   Future<void> _setCancelledDB() async {
+    authenticateUser();
+
     http.post(Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/prenotazioni?action=rimuoviPrenotazioni'
             '&idCorso=$corso&emailDocente=$docente&data=$data&fasciaOraria=$fasciaOraria'));
   }

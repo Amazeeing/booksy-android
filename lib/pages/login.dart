@@ -62,7 +62,7 @@ class _LoginFormState extends State<LoginForm> {
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   _saveCredentials();
-                  Navigator.pushReplacementNamed(context, '/auth');
+                  Navigator.pushReplacementNamed(context, '/');
                 }
               },
               child: const Text('Accedi')
