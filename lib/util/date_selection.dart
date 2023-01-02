@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 Future<Map<String, List<String>>> _fetchAvailableSlots() async {
-  final response = await http.get(
-      Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/slot-disponibili?action=ottieniSlotDisponibiliDocente'));
+  final response = await http.get(Uri.http(
+      'localhost:8080/progetto_TWeb_war_exploded',
+      '/slot-disponibili',
+      {'action': 'ottieniSlotDisponibiliDocente'}));
 
   return _parseAvailableSlots(response.body);
 }
@@ -26,48 +28,60 @@ class DateSelection extends StatefulWidget {
 }
 
 class _DateSelectionState extends State<DateSelection> {
-  final List<String> _daysList = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì'];
-  final List<String> _timeSlots = ['15:00 - 16:00', '16:00 - 17:00', '18:00 - 19:00'];
-
   String? selected;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Text('Seleziona una data'),
-        DropdownButtonFormField<String>(
-          items: _daysList.map<DropdownMenuItem<String>>((String day) {
-            return DropdownMenuItem<String>(
-              value: day,
-              child: Text(day),
+    return FutureBuilder<Map<String, List<String>>>(
+        future: _fetchAvailableSlots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Text(
+                'Impossibile reperire le fascie orarie per il docente selezionato.');
+          } else if (snapshot.hasData) {
+            Map<String, List<String>> timeSlots = snapshot.data!;
+            return Column(
+              children: [
+                const Text('Seleziona una data'),
+                const SizedBox(height: 10.0),
+                DropdownButtonFormField<String>(
+                  items: timeSlots.keys
+                      .map<DropdownMenuItem<String>>((String day) {
+                    return DropdownMenuItem<String>(
+                      value: day,
+                      child: Text(day),
+                    );
+                  }).toList(),
+                  onChanged: (String? value) {
+                    selected = value!;
+                    widget.fields['date'] = value;
+                  },
+                  decoration:
+                      const InputDecoration(border: OutlineInputBorder()),
+                ),
+                const SizedBox(height: 20.0),
+                const Text('Seleziona una fascia oraria'),
+                const SizedBox(height: 10.0),
+                DropdownButtonFormField<String>(
+                  items:
+                      timeSlots[widget.fields['date']]!.map((String timeSlot) {
+                    return DropdownMenuItem<String>(
+                      value: timeSlot,
+                      child: Text(timeSlot),
+                    );
+                  }).toList(),
+                  onChanged: (String? value) {
+                    selected = value!;
+                    widget.fields['time'] = value;
+                  },
+                  decoration:
+                      const InputDecoration(border: OutlineInputBorder()),
+                )
+              ],
             );
-          }).toList(),
-          onChanged: (String? value) {
-            selected = value!;
-            widget.fields['date'] = value;
-          },
-          decoration: const InputDecoration(
-              border: OutlineInputBorder()
-          ),
-        ),
-        const Text('Seleziona una fascia oraria'),
-        DropdownButtonFormField<String>(
-          items: _timeSlots.map((String timeSlot) {
-            return DropdownMenuItem<String>(
-              value: timeSlot,
-              child: Text(timeSlot),
-            );
-          }).toList(),
-          onChanged: (String? value) {
-            selected = value!;
-            widget.fields['time'] = value;
-          },
-          decoration: const InputDecoration(
-              border: OutlineInputBorder()
-          ),
-        )
-      ],
-    );
+          } else {
+            return const LinearProgressIndicator();
+          }
+        });
   }
 }

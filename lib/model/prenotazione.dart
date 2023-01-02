@@ -26,33 +26,37 @@ class Prenotazione {
 
   factory Prenotazione.fromJson(Map<String, dynamic> json) {
     return Prenotazione(
-      utente: json['utente'],
-      corso: json['corso'],
-      docente: json['docente'],
-      data: json['data'],
-      fasciaOraria: json['fasciaOraria'],
-      dataCancellazione: json['dataCancellazione'],
-      attiva: json['attiva'],
-      effettuata: json['effettuata']
-    );
+        utente: json['utente'],
+        corso: json['corso'],
+        docente: json['docente'],
+        data: json['data'],
+        fasciaOraria: json['fasciaOraria'],
+        dataCancellazione: json['dataCancellazione'],
+        attiva: json['attiva'],
+        effettuata: json['effettuata']);
   }
 
   Map<String, dynamic> toJson() => {
-    'utente': utente,
-    'corso': corso,
-    'docente': docente,
-    'data': data,
-    'fasciaOraria': fasciaOraria,
-    'dataCancellazione': dataCancellazione,
-    'attiva': attiva,
-    'effettuata': effettuata
+        'utente': utente,
+        'corso': corso,
+        'docente': docente,
+        'data': data,
+        'fasciaOraria': fasciaOraria,
+        'dataCancellazione': dataCancellazione,
+        'attiva': attiva,
+        'effettuata': effettuata
   };
 
   Future<void> _setAppointedDB() async {
     authenticateUser();
 
-    http.post(Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/prenotazioni?action=impostaPrenotazioneEffettuata'
-                    '&emailDocente=$docente&data=$data&fasciaOraria=$fasciaOraria'));
+    http.post(Uri.http(
+        'localhost:8080/progetto_TWeb_war_exploded', '/prenotazioni', {
+      'action': 'impostaPrenotazioneEffettuata',
+      'emailDocente': docente,
+      'data': data,
+      'fasciaOraria': fasciaOraria
+    }));
   }
 
   void setAppointed() {
@@ -65,8 +69,14 @@ class Prenotazione {
   Future<void> _setCancelledDB() async {
     authenticateUser();
 
-    http.post(Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/prenotazioni?action=rimuoviPrenotazioni'
-            '&idCorso=$corso&emailDocente=$docente&data=$data&fasciaOraria=$fasciaOraria'));
+    http.post(Uri.http(
+        'localhost:8080/progetto_TWeb_war_exploded', '/prenotazioni', {
+      'action': 'impostaPrenotazioneEffettuata',
+      'idCorso': corso,
+      'emailDocente': docente,
+      'data': data,
+      'fasciaOraria': fasciaOraria
+    }));
   }
 
   void setCancelled() {
