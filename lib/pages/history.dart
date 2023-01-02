@@ -17,7 +17,7 @@ const Map<String, String> _appointmentURL = {
 
 Future<List<Prenotazione>> _fetchAppointments(String userRole) async {
   /* Autentico l'utente per poter rinnovare la sessione */
-  authenticateUser();
+  await authenticateUser();
 
   /* Ottengo le prenotazioni rilevanti al ruolo dell'utente */
   String appointmentsURL = _appointmentURL[userRole]!;

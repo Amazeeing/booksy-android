@@ -8,7 +8,7 @@ import 'package:prenotazioni/util/common.dart';
 import 'package:prenotazioni/util/appointment_list.dart';
 
 Future<List<Prenotazione>> _fetchImminentAppointments(Utente user) async {
-  authenticateUser();
+  await authenticateUser();
 
   final response = await http.get(Uri.http(
       'localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni',
@@ -46,6 +46,7 @@ class WelcomePage extends StatelessWidget {
               future: _fetchImminentAppointments(user),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
+                  print(snapshot.error);
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,

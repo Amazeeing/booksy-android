@@ -48,7 +48,7 @@ class Prenotazione {
   };
 
   Future<void> _setAppointedDB() async {
-    authenticateUser();
+    await authenticateUser();
 
     http.post(Uri.http(
         'localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni', {
@@ -67,7 +67,7 @@ class Prenotazione {
   }
 
   Future<void> _setCancelledDB() async {
-    authenticateUser();
+    await authenticateUser();
 
     http.post(Uri.http(
         'localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni', {

@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   void _logUserOut() async {
-    authenticateUser();
+    await authenticateUser();
 
     await http.post(Uri.http('localhost:8080',
         'progetto_TWeb_war_exploded/autentica', {'action': 'scollegaUtente'}));

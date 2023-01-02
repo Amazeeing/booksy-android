@@ -7,7 +7,7 @@ import 'package:prenotazioni/model/corso.dart';
 import 'package:prenotazioni/util/common.dart';
 
 Future<List<Corso>> _fetchCourses() async {
-  authenticateUser();
+  await authenticateUser();
 
   final response = await http.get(Uri.http('localhost:8080',
       'progetto_TWeb_war_exploded/corsi', {'action': 'ottieniCorsi'}));
