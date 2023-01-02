@@ -17,6 +17,8 @@ class BookingPage extends StatefulWidget {
 }
 
 class _BookingPageState extends State<BookingPage> {
+  final GlobalKey<FormState> _bookingFormKey = GlobalKey<FormState>();
+
   Future<void> _addAppointment(Map<String, String> fields) async {
     http.post(
         Uri.http('localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni', {
@@ -41,6 +43,7 @@ class _BookingPageState extends State<BookingPage> {
         body: SafeArea(
           minimum: const EdgeInsets.all(50.0),
           child: Form(
+            key: _bookingFormKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -75,8 +78,10 @@ class _BookingPageState extends State<BookingPage> {
                             const SizedBox(width: 20.0),
                             ElevatedButton(
                                 onPressed: () {
-                                  _addAppointment(BookingPage.fields);
-                                  Navigator.pushReplacementNamed(context, '/');
+                                  if(_bookingFormKey.currentState!.validate()) {
+                                    _addAppointment(BookingPage.fields);
+                                    Navigator.pushReplacementNamed(context, '/');
+                                  }
                                 },
                                 child: const Text('Prenota'))
                           ],
