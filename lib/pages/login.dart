@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({Key? key}) : super(key: key);
+  const LoginForm({this.error, Key? key}) : super(key: key);
+
+  final String? error;
 
   @override
   State<LoginForm> createState() => _LoginFormState();
@@ -65,15 +67,19 @@ class _LoginFormState extends State<LoginForm> {
                   Navigator.pushReplacementNamed(context, '/');
                 }
               },
-              child: const Text('Accedi')
-          ),
+              child: const Text('Accedi')),
           const SizedBox(height: 20.0),
           const Text(
             'Non hai un account?',
           ),
           TextButton(
               onPressed: () => {Navigator.pushNamed(context, '/register')},
-              child: const Text('Registrati')
+              child: const Text('Registrati')),
+          Text(
+            'Si è verificato un\'errore durante l\'accesso: ${widget.error}. Riprovare',
+            maxLines: 3,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.red),
           )
         ],
       ),
@@ -89,7 +95,9 @@ class _LoginFormState extends State<LoginForm> {
 }
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({this.error, Key? key}) : super(key: key);
+
+  final String? error;
 
   @override
   Widget build(BuildContext context) {
@@ -100,22 +108,22 @@ class LoginPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-          Image.asset('assets/logo.png', fit: BoxFit.contain),
-          const SizedBox(height: 20.0),
-          const Text(
-            'Dai un boost alla tua carriera universitaria 🚀',
-            maxLines: 2,
-            textScaleFactor: 1.5,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 100.0),
-          const Text(
-            'Effettua l\'accesso',
-            textScaleFactor: 1.5,
-          ),
-          const SizedBox(height: 20.0),
-          const LoginForm()
-        ]),
+              Image.asset('assets/logo.png', fit: BoxFit.contain),
+              const SizedBox(height: 20.0),
+              const Text(
+                'Dai un boost alla tua carriera universitaria 🚀',
+                maxLines: 2,
+                textScaleFactor: 1.5,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 100.0),
+              const Text(
+                'Effettua l\'accesso',
+                textScaleFactor: 1.5,
+              ),
+              const SizedBox(height: 20.0),
+              LoginForm(error: error)
+            ]),
       ),
     );
   }
