@@ -12,11 +12,11 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     WebViewController controller = WebViewController();
-    controller.loadRequest(Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/#/register'));
+    controller.loadRequest(Uri.http('localhost:8080', '/#/progetto_TWeb_war_exploded/register'));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pagina di login'),
+        title: const Text('Registrazione'),
       ),
       body: WebViewWidget(
         controller: controller

@@ -19,12 +19,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-  
+
   void _logUserOut() async {
     authenticateUser();
 
-    await http.post(
-        Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/autentica?action=scollegaUtente'));
+    await http.post(Uri.http('localhost:8080',
+        'progetto_TWeb_war_exploded/autentica', {'action': 'scollegaUtente'}));
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.clear();
@@ -32,16 +32,19 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> pages = [WelcomePage(widget.user), HistoryPage(widget.user)];
+    final List<Widget> pages = [
+      WelcomePage(widget.user),
+      HistoryPage(widget.user)
+    ];
 
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.white,
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 10.0),
-            child: Image.asset('assets/logo.png', fit: BoxFit.fitWidth),
-          ),
-          leadingWidth: 100.0,
+        backgroundColor: Colors.white,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 10.0),
+          child: Image.asset('assets/logo.png', fit: BoxFit.fitWidth),
+        ),
+        leadingWidth: 100.0,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -57,18 +60,15 @@ class _HomePageState extends State<HomePage> {
       ),
       body: SafeArea(
           minimum: const EdgeInsets.all(50.0),
-          child: Center(
-            child: pages.elementAt(_selectedIndex)
-          )
-      ),
+          child: Center(child: pages.elementAt(_selectedIndex))),
       floatingActionButton: Visibility(
         visible: widget.user.ruolo == 'studente',
         child: FloatingActionButton.extended(
           onPressed: () => {
             Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => BookingPage(widget.user))
-            )
+                MaterialPageRoute(
+                    builder: (context) => BookingPage(widget.user)))
           },
           label: const Text('Prenota'),
           icon: const Icon(Icons.add),

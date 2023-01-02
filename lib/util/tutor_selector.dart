@@ -6,9 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:prenotazioni/model/docente.dart';
 
 Future<List<Docente>> _fetchTutorsByCourse(String name) async {
-  final response = await http.get(
-      Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/docenti?action=filtraDocentePerCorso'
-                '&corso=$name'));
+  final response = await http.get(Uri.http(
+      'localhost:8080',
+      '/progetto_TWeb_war_exploded/docenti',
+      {'action': 'filtraDocentePerCorso', 'corso': name}));
 
   return _parseTutors(response.body);
 }
@@ -18,7 +19,6 @@ List<Docente> _parseTutors(String responseBody) {
 
   return parsed.map<Docente>((json) => Docente.fromJson(json)).toList();
 }
-
 
 class TutorSelection extends StatefulWidget {
   TutorSelection(this.fields, {Key? key}) : super(key: key);
@@ -34,14 +34,14 @@ class _TutorSelectionState extends State<TutorSelection> {
 
   @override
   Widget build(BuildContext context) {
-    if(widget.fields['course'] == null) {
+    if (widget.fields['course'] == null) {
       return const Text('Nessun corso selezionato.');
     }
 
     return FutureBuilder<List<Docente>>(
       future: _fetchTutorsByCourse(widget.fields['course']!),
       builder: (context, snapshot) {
-        if(snapshot.hasError) {
+        if (snapshot.hasError) {
           return const Text('Impossibile reperire i corsi disponibili.');
         } else if (snapshot.hasData) {
           return Column(
@@ -59,9 +59,7 @@ class _TutorSelectionState extends State<TutorSelection> {
                   selected = value;
                   widget.fields['tutor'] = value!.email;
                 },
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder()
-                ),
+                decoration: const InputDecoration(border: OutlineInputBorder()),
               )
             ],
           );

@@ -9,8 +9,8 @@ import 'package:prenotazioni/util/common.dart';
 Future<List<Corso>> _fetchCourses() async {
   authenticateUser();
 
-  final response = await http.get(
-      Uri.parse('http://localhost:8080/progetto_TWeb_war_exploded/corsi?action=ottieniCorsi'));
+  final response = await http.get(Uri.http('localhost:8080',
+      'progetto_TWeb_war_exploded/corsi', {'action': 'ottieniCorsi'}));
 
   return _parseCourses(response.body);
 }
@@ -36,36 +36,31 @@ class _CourseSelectionState extends State<CourseSelection> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Corso>>(
-        future: _fetchCourses(),
-        builder: (context, snapshot) {
-          if(snapshot.hasError) {
-            return const Text('Impossibile reperire i corsi disponibili.');
-          } else if (snapshot.hasData) {
-            return Column(
-              children: [
-                const Text('Seleziona un corso'),
-                DropdownButtonFormField<Corso>(
-                  value: selected,
-                  items: snapshot.data!.map((corso) {
-                    return DropdownMenuItem<Corso>(
-                      value: corso,
-                      child: Text(corso.nome),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    selected = value;
-                    widget.fields['course'] = value!.nome;
-                  },
-                  decoration: const InputDecoration(
-                      border: OutlineInputBorder()
-                  )
-                )
-              ]
-            );
-          } else {
-            return const LinearProgressIndicator();
-          }
-        },
+      future: _fetchCourses(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const Text('Impossibile reperire i corsi disponibili.');
+        } else if (snapshot.hasData) {
+          return Column(children: [
+            const Text('Seleziona un corso'),
+            DropdownButtonFormField<Corso>(
+                value: selected,
+                items: snapshot.data!.map((corso) {
+                  return DropdownMenuItem<Corso>(
+                    value: corso,
+                    child: Text(corso.nome),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  selected = value;
+                  widget.fields['course'] = value!.nome;
+                },
+                decoration: const InputDecoration(border: OutlineInputBorder()))
+          ]);
+        } else {
+          return const LinearProgressIndicator();
+        }
+      },
     );
   }
 }

@@ -10,8 +10,9 @@ import 'package:prenotazioni/util/appointment_list.dart';
 Future<List<Prenotazione>> _fetchImminentAppointments(Utente user) async {
   authenticateUser();
 
-  final response = await http.get(Uri.parse(
-      'http://localhost:8080/progetto_TWeb_war_exploded/prenotazioni?action=ottieniPrenotazioniUtenteImminenti'));
+  final response = await http.get(Uri.http(
+      'localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni',
+      {'action': 'ottieniPrenotazioniUtenteImminenti'}));
 
   return _parseAppointments(response.body);
 }
@@ -52,9 +53,9 @@ class WelcomePage extends StatelessWidget {
                       Icon(Icons.question_mark_sharp, size: 80),
                       SizedBox(height: 10.0),
                       Text(
-                          'Impossibile reperire le prenotazioni imminenti.\nRiprova più tardi.',
-                          textAlign: TextAlign.center,
-                        ),
+                        'Impossibile reperire le prenotazioni imminenti.\nRiprova più tardi.',
+                        textAlign: TextAlign.center,
+                      ),
                     ],
                   );
                 } else if (snapshot.hasData) {
