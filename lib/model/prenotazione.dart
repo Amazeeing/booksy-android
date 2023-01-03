@@ -1,6 +1,5 @@
 import 'package:http/http.dart' as http;
-
-import 'package:prenotazioni/util/common.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Prenotazione {
   final String utente;
@@ -48,15 +47,29 @@ class Prenotazione {
   };
 
   Future<void> _setAppointedDB() async {
-    await authenticateUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? username = prefs.getString('username');
+    String? password = prefs.getString('password');
 
-    http.post(Uri.http(
+    http.Client client = http.Client();
+
+    /* Autentico l'utente per poter rinnovare la sessione */
+    await client.post(Uri.http(
+        'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
+        {'action': 'autenticaUtente',
+          'username': username,
+          'password': password}));
+
+    /* Imposto la prenotazione come effettuata nel DB */
+    await client.post(Uri.http(
         'localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni', {
       'action': 'impostaPrenotazioneEffettuata',
       'emailDocente': docente,
       'data': data,
       'fasciaOraria': fasciaOraria
     }));
+
+    client.close();
   }
 
   void setAppointed() {
@@ -67,16 +80,30 @@ class Prenotazione {
   }
 
   Future<void> _setCancelledDB() async {
-    await authenticateUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? username = prefs.getString('username');
+    String? password = prefs.getString('password');
 
-    http.post(Uri.http(
+    http.Client client = http.Client();
+
+    /* Autentico l'utente per poter rinnovare la sessione */
+    await client.post(Uri.http(
+        'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
+        {'action': 'autenticaUtente',
+          'username': username,
+          'password': password}));
+
+    /* Imposta la prenotazione come cancellata nel DB */
+    await client.post(Uri.http(
         'localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni', {
-      'action': 'impostaPrenotazioneEffettuata',
+      'action': 'impostaPrenotazioneAnnullata',
       'idCorso': corso,
       'emailDocente': docente,
       'data': data,
       'fasciaOraria': fasciaOraria
     }));
+
+    client.close();
   }
 
   void setCancelled() {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:prenotazioni/model/utente.dart';
 import 'package:prenotazioni/util/course_selection.dart';
@@ -20,7 +21,20 @@ class _BookingPageState extends State<BookingPage> {
   final GlobalKey<FormState> _bookingFormKey = GlobalKey<FormState>();
 
   Future<void> _addAppointment(Map<String, String> fields) async {
-    http.post(
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? username = prefs.getString('username');
+    String? password = prefs.getString('password');
+
+    http.Client client = http.Client();
+
+    /* Autentico l'utente per poter rinnovare la sessione */
+    await client.post(Uri.http(
+        'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
+        {'action': 'autenticaUtente',
+          'username': username,
+          'password': password}));
+
+    await client.post(
         Uri.http('localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni', {
       'action': 'aggiungiPrenotazione',
       'idCorso': fields['course'],
@@ -28,6 +42,8 @@ class _BookingPageState extends State<BookingPage> {
       'data': fields['date'],
       'fasciaOraria': fields['time']
     }));
+
+    client.close();
   }
 
   @override
@@ -54,7 +70,7 @@ class _BookingPageState extends State<BookingPage> {
                 const SizedBox(height: 30.0),
                 Card(
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(30.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -69,7 +85,7 @@ class _BookingPageState extends State<BookingPage> {
                             child: DateSelection(BookingPage.fields)),
                         const SizedBox(height: 20.0),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             OutlinedButton(
                                 onPressed: () => Navigator.pushReplacementNamed(
@@ -83,7 +99,8 @@ class _BookingPageState extends State<BookingPage> {
                                     Navigator.pushReplacementNamed(context, '/');
                                   }
                                 },
-                                child: const Text('Prenota'))
+                                child: const Text('Prenota')
+                            )
                           ],
                         )
                       ],

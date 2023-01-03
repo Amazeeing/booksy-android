@@ -2,14 +2,30 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:prenotazioni/model/docente.dart';
 
 Future<List<Docente>> _fetchTutorsByCourse(String name) async {
-  final response = await http.get(Uri.http(
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? username = prefs.getString('username');
+  String? password = prefs.getString('password');
+
+  http.Client client = http.Client();
+
+  /* Autentico l'utente per poter rinnovare la sessione */
+  await client.post(Uri.http(
+      'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
+      {'action': 'autenticaUtente',
+        'username': username,
+        'password': password}));
+
+  final response = await client.get(Uri.http(
       'localhost:8080',
       '/progetto_TWeb_war_exploded/docenti',
       {'action': 'filtraDocentePerCorso', 'corso': name}));
+
+  client.close();
 
   return _parseTutors(response.body);
 }

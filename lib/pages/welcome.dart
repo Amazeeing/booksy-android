@@ -1,18 +1,31 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:prenotazioni/model/utente.dart';
 import 'package:prenotazioni/model/prenotazione.dart';
-import 'package:prenotazioni/util/common.dart';
 import 'package:prenotazioni/util/appointment_list.dart';
 
 Future<List<Prenotazione>> _fetchImminentAppointments(Utente user) async {
-  await authenticateUser();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? username = prefs.getString('username');
+  String? password = prefs.getString('password');
 
-  final response = await http.get(Uri.http(
+  http.Client client = http.Client();
+
+  /* Autentico l'utente per poter rinnovare la sessione */
+  await client.post(Uri.http(
+      'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
+      {'action': 'autenticaUtente',
+        'username': username,
+        'password': password}));
+
+  final response = await client.get(Uri.http(
       'localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni',
       {'action': 'ottieniPrenotazioniUtenteImminenti'}));
+
+  client.close();
 
   return _parseAppointments(response.body);
 }
@@ -46,7 +59,6 @@ class WelcomePage extends StatelessWidget {
               future: _fetchImminentAppointments(user),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  print(snapshot.error);
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,

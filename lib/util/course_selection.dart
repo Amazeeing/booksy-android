@@ -2,15 +2,28 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:prenotazioni/model/corso.dart';
-import 'package:prenotazioni/util/common.dart';
 
 Future<List<Corso>> _fetchCourses() async {
-  await authenticateUser();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? username = prefs.getString('username');
+  String? password = prefs.getString('password');
 
-  final response = await http.get(Uri.http('localhost:8080',
+  http.Client client = http.Client();
+
+  /* Autentico l'utente per poter rinnovare la sessione */
+  await client.post(Uri.http(
+      'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
+      {'action': 'autenticaUtente',
+        'username': username,
+        'password': password}));
+
+  final response = await client.get(Uri.http('localhost:8080',
       'progetto_TWeb_war_exploded/corsi', {'action': 'ottieniCorsi'}));
+
+  client.close();
 
   return _parseCourses(response.body);
 }

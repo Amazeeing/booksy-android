@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:prenotazioni/pages/booking.dart';
 import 'package:prenotazioni/pages/history.dart';
 import 'package:prenotazioni/model/utente.dart';
-import 'package:prenotazioni/util/common.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage(this.user, {Key? key}) : super(key: key);
@@ -21,12 +20,24 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   void _logUserOut() async {
-    await authenticateUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? username = prefs.getString('username');
+    String? password = prefs.getString('password');
 
-    await http.post(Uri.http('localhost:8080',
+    http.Client client = http.Client();
+
+    /* Autentico l'utente per poter rinnovare la sessione */
+    await client.post(Uri.http(
+        'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
+        {'action': 'autenticaUtente',
+          'username': username,
+          'password': password}));
+
+    await client.post(Uri.http('localhost:8080',
         'progetto_TWeb_war_exploded/autentica', {'action': 'scollegaUtente'}));
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    client.close();
+
     prefs.clear();
   }
 

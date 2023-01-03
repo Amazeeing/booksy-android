@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:prenotazioni/model/utente.dart';
 import 'package:prenotazioni/model/prenotazione.dart';
-import 'package:prenotazioni/util/common.dart';
 import 'package:prenotazioni/util/appointment_list.dart';
 
 /* Una map per legare il ruolo dell' utente all'URL dove ottenere
@@ -16,14 +16,26 @@ const Map<String, String> _appointmentURL = {
 };
 
 Future<List<Prenotazione>> _fetchAppointments(String userRole) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? username = prefs.getString('username');
+  String? password = prefs.getString('password');
+
+  http.Client client = http.Client();
+
   /* Autentico l'utente per poter rinnovare la sessione */
-  await authenticateUser();
+  await client.post(Uri.http(
+      'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
+      {'action': 'autenticaUtente',
+        'username': username,
+        'password': password}));
 
   /* Ottengo le prenotazioni rilevanti al ruolo dell'utente */
   String appointmentsURL = _appointmentURL[userRole]!;
-  final response = await http.get(Uri.http(
+  final response = await client.get(Uri.http(
       'localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni',
       {'action': appointmentsURL}));
+
+  client.close();
 
   /* Faccio il parsing da JSON a una lista contenente oggetti di tipo Prenotazione */
   return _parseAppointments(response.body);
