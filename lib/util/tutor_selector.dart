@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:prenotazioni/model/docente.dart';
+import 'package:prenotazioni/util/fields_notifier.dart';
 
 Future<List<Docente>> _fetchTutorsByCourse(String name) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -36,44 +38,40 @@ List<Docente> _parseTutors(String responseBody) {
   return parsed.map<Docente>((json) => Docente.fromJson(json)).toList();
 }
 
-class TutorSelection extends StatefulWidget {
-  TutorSelection(this.fields, {Key? key}) : super(key: key);
+class TutorSelection extends ConsumerWidget {
+  const TutorSelection(this.fieldsProvider, {Key? key}) : super(key: key);
 
-  Map<String, String> fields;
-
-  @override
-  State<TutorSelection> createState() => _TutorSelectionState();
-}
-
-class _TutorSelectionState extends State<TutorSelection> {
-  Docente? selected;
+  final StateNotifierProvider<FieldsNotifier, Map<String, String?>> fieldsProvider;
 
   @override
-  Widget build(BuildContext context) {
-    if (widget.fields['course'] == null) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    Map<String, String?> fields = ref.watch(fieldsProvider);
+
+    if (fields['course'] == null) {
       return const Text('Nessun corso selezionato.');
     }
 
     return FutureBuilder<List<Docente>>(
-      future: _fetchTutorsByCourse(widget.fields['course']!),
+      future: _fetchTutorsByCourse(fields['course']!),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return const Text('Impossibile reperire i corsi disponibili.');
+          return const Text('Impossibile reperire i docenti disponibili.');
         } else if (snapshot.hasData) {
           return Column(
             children: [
               const Text('Seleziona un docente'),
-              DropdownButtonFormField<Docente>(
-                value: selected,
+              const SizedBox(height: 10.0),
+              DropdownButtonFormField<String>(
+                value: fields['tutor'],
+                disabledHint: Text('Nessun docente che insegni il corso ${fields['course']}'),
                 items: snapshot.data!.map((docente) {
-                  return DropdownMenuItem<Docente>(
-                    value: docente,
-                    child: Text(docente.nome + docente.cognome),
+                  return DropdownMenuItem<String>(
+                    value: docente.nome,
+                    child: Text('${docente.nome} ${docente.cognome}'),
                   );
                 }).toList(),
-                onChanged: (Docente? value) {
-                  selected = value;
-                  widget.fields['tutor'] = value!.email;
+                onChanged: (value) {
+                  ref.read(fieldsProvider.notifier).setTutor(value!);
                 },
                 decoration: const InputDecoration(border: OutlineInputBorder()),
               )

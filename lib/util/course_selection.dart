@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:prenotazioni/model/corso.dart';
+import 'package:prenotazioni/util/fields_notifier.dart';
 
 Future<List<Corso>> _fetchCourses() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -15,10 +17,11 @@ Future<List<Corso>> _fetchCourses() async {
 
   /* Autentico l'utente per poter rinnovare la sessione */
   await client.post(Uri.http(
-      'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
-      {'action': 'autenticaUtente',
-        'username': username,
-        'password': password}));
+      'localhost:8080', '/progetto_TWeb_war_exploded/autentica', {
+    'action': 'autenticaUtente',
+    'username': username,
+    'password': password
+  }));
 
   final response = await client.get(Uri.http('localhost:8080',
       'progetto_TWeb_war_exploded/corsi', {'action': 'ottieniCorsi'}));
@@ -34,20 +37,16 @@ List<Corso> _parseCourses(String responseBody) {
   return parsed.map<Corso>((json) => Corso.fromJson(json)).toList();
 }
 
-class CourseSelection extends StatefulWidget {
-  CourseSelection(this.fields, {Key? key}) : super(key: key);
+class CourseSelection extends ConsumerWidget {
+  const CourseSelection(this.fieldsProvider, {Key? key}) : super(key: key);
 
-  Map<String, String> fields;
-
-  @override
-  State<CourseSelection> createState() => _CourseSelectionState();
-}
-
-class _CourseSelectionState extends State<CourseSelection> {
-  Corso? selected;
+  final StateNotifierProvider<FieldsNotifier, Map<String, String?>>
+      fieldsProvider;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    Map<String, String?> fields = ref.watch(fieldsProvider);
+
     return FutureBuilder<List<Corso>>(
       future: _fetchCourses(),
       builder: (context, snapshot) {
@@ -56,17 +55,17 @@ class _CourseSelectionState extends State<CourseSelection> {
         } else if (snapshot.hasData) {
           return Column(children: [
             const Text('Seleziona un corso'),
-            DropdownButtonFormField<Corso>(
-                value: selected,
+            const SizedBox(height: 10.0),
+            DropdownButtonFormField<String>(
+                value: fields['course'],
                 items: snapshot.data!.map((corso) {
-                  return DropdownMenuItem<Corso>(
-                    value: corso,
+                  return DropdownMenuItem<String>(
+                    value: corso.nome,
                     child: Text(corso.nome),
                   );
                 }).toList(),
                 onChanged: (value) {
-                  selected = value;
-                  widget.fields['course'] = value!.nome;
+                  ref.read(fieldsProvider.notifier).setCourse(value!);
                 },
                 decoration: const InputDecoration(border: OutlineInputBorder()))
           ]);

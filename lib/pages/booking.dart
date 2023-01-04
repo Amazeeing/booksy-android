@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -6,21 +7,20 @@ import 'package:prenotazioni/model/utente.dart';
 import 'package:prenotazioni/util/course_selection.dart';
 import 'package:prenotazioni/util/tutor_selector.dart';
 import 'package:prenotazioni/util/date_selection.dart';
+import 'package:prenotazioni/util/fields_notifier.dart';
 
-class BookingPage extends StatefulWidget {
-  const BookingPage(this.user, {Key? key}) : super(key: key);
+final provider = StateNotifierProvider<FieldsNotifier, Map<String, String?>>((ref) {
+  return FieldsNotifier();
+});
+
+class BookingPage extends ConsumerWidget {
+  BookingPage(this.user, {Key? key}) : super(key: key);
 
   final Utente user;
-  static Map<String, String> fields = {};
 
-  @override
-  State<BookingPage> createState() => _BookingPageState();
-}
-
-class _BookingPageState extends State<BookingPage> {
   final GlobalKey<FormState> _bookingFormKey = GlobalKey<FormState>();
 
-  Future<void> _addAppointment(Map<String, String> fields) async {
+  Future<void> _addAppointment(Map<String, String?> fields) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? username = prefs.getString('username');
     String? password = prefs.getString('password');
@@ -47,7 +47,7 @@ class _BookingPageState extends State<BookingPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
         appBar: AppBar(
             backgroundColor: Colors.white,
@@ -74,28 +74,26 @@ class _BookingPageState extends State<BookingPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CourseSelection(BookingPage.fields),
+                        CourseSelection(provider),
                         const SizedBox(height: 20.0),
-                        Visibility(
-                            visible: BookingPage.fields['course'] != null,
-                            child: TutorSelection(BookingPage.fields)),
+                        TutorSelection(provider),
                         const SizedBox(height: 20.0),
-                        Visibility(
-                            visible: BookingPage.fields['tutor'] != null,
-                            child: DateSelection(BookingPage.fields)),
+                        DateSelection(provider),
                         const SizedBox(height: 20.0),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             OutlinedButton(
-                                onPressed: () => Navigator.pushReplacementNamed(
-                                    context, '/'),
+                                onPressed: () {
+                                  ref.read(provider.notifier).clear();
+                                  Navigator.pushReplacementNamed(context, '/');
+                                },
                                 child: const Text('Annulla')),
                             const SizedBox(width: 20.0),
                             ElevatedButton(
                                 onPressed: () {
                                   if(_bookingFormKey.currentState!.validate()) {
-                                    _addAppointment(BookingPage.fields);
+                                    _addAppointment(ref.read(provider));
                                     Navigator.pushReplacementNamed(context, '/');
                                   }
                                 },
