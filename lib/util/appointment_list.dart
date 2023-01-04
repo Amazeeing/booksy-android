@@ -91,24 +91,25 @@ class _AppointmentCardState extends State<AppointmentCard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(widget.current.docente),
+                  Text(widget.current.corso, textScaleFactor: 1.25),
                   Visibility(
                     visible: widget.current.attiva != false,
                     child: statusChangeMenu,
                   )
                 ],
               ),
-              const SizedBox(height: 20.0),
-              Text(widget.current.corso),
-              const SizedBox(height: 20.0),
+              const SizedBox(height: 10.0),
+              Text(widget.current.docente),
+              const SizedBox(height: 10.0),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(widget.current.fasciaOraria),
                   const SizedBox(width: 10.0),
                   Text(
                     widget.current.data,
                     textScaleFactor: 0.75,
-                    style: TextStyle(color: Colors.grey[500]),
+                    style: TextStyle(color: Colors.grey[500])
                   )
                 ],
               ),
@@ -146,9 +147,11 @@ class AppointmentsList extends StatelessWidget {
         return AppointmentCard(appointments[index], userRole);
       },
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 500.0,
+          maxCrossAxisExtent: 350.0,
+          childAspectRatio: 3.5 / 2.25,
           mainAxisSpacing: 20.0,
-          crossAxisSpacing: 20.0),
+          crossAxisSpacing: 20.0
+      ),
     );
   }
 }
