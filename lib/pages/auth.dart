@@ -20,6 +20,7 @@ Future<Utente?> _authenticateUser() async {
       {'action': 'autenticaUtente',
         'username': username,
         'password': password}));
+
   String userData = response.body;
 
   /* Converto la risposta da formato JSON a un oggetto di tipo Utente */
@@ -40,11 +41,6 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-  String _translateErrorMessage(Object? error) {
-    String errorMessage = error.toString();
-    return errorMessage;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,8 +48,7 @@ class _AuthPageState extends State<AuthPage> {
         future: _authenticateUser(),
         builder: (context, snapshot) {
           if(snapshot.hasError) {
-            String? errorMessage = _translateErrorMessage(snapshot.error);
-            return LoginPage(error: errorMessage);
+            return LoginPage(error: snapshot.error.toString());
           } else if(snapshot.hasData) {
             return HomePage(snapshot.data!);
           } else {

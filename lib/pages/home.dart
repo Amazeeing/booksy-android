@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: SafeArea(
-          minimum: const EdgeInsets.all(50.0),
+          minimum: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 50.0),
           child: Center(child: pages.elementAt(_selectedIndex))),
       floatingActionButton: Visibility(
         visible: widget.user.ruolo == 'studente',

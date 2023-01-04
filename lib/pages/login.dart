@@ -75,11 +75,14 @@ class _LoginFormState extends State<LoginForm> {
           TextButton(
               onPressed: () => {Navigator.pushNamed(context, '/register')},
               child: const Text('Registrati')),
-          Text(
-            'Si è verificato un\'errore durante l\'accesso: ${widget.error}. Riprovare',
-            maxLines: 3,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.red),
+          Visibility(
+            visible: widget.error != null,
+            child: const Text(
+              'Si è verificato un\'errore durante l\'accesso. Riprovare.',
+              maxLines: 3,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.red),
+            ),
           )
         ],
       ),
