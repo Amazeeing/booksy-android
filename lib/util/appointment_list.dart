@@ -75,7 +75,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
         offset: const Offset(-5.0, 5.0),
         icon: const Icon(Icons.more_vert),
         elevation: 5.0,
-        itemBuilder: (context) => _getPopUpMenuEntries());
+        itemBuilder: (context) => _getPopUpMenuEntries()
+    );
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -93,7 +94,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                 children: [
                   Text(widget.current.corso, textScaleFactor: 1.25),
                   Visibility(
-                    visible: widget.current.attiva != false,
+                    visible: statusText == 'Attiva',
                     child: statusChangeMenu,
                   )
                 ],
