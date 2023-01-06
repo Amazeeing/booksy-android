@@ -57,7 +57,7 @@ class BookingPage extends ConsumerWidget {
             ),
             leadingWidth: 100.0),
         body: SafeArea(
-          minimum: const EdgeInsets.all(50.0),
+          minimum: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 50.0),
           child: Form(
             key: _bookingFormKey,
             child: Column(

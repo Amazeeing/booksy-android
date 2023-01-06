@@ -106,7 +106,7 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        minimum: const EdgeInsets.symmetric(vertical: 100.0, horizontal: 125.0),
+        minimum: const EdgeInsets.symmetric(vertical: 25.0, horizontal: 50.0),
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
