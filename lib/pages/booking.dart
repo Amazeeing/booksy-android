@@ -5,8 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:prenotazioni/model/utente.dart';
 import 'package:prenotazioni/util/course_selection.dart';
-import 'package:prenotazioni/util/tutor_selector.dart';
+import 'package:prenotazioni/util/tutor_selection.dart';
 import 'package:prenotazioni/util/date_selection.dart';
+import 'package:prenotazioni/util/timeslot_selection.dart';
 import 'package:prenotazioni/util/fields_notifier.dart';
 
 final provider = StateNotifierProvider<FieldsNotifier, Map<String, String?>>((ref) {
@@ -72,7 +73,6 @@ class BookingPage extends ConsumerWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(30.0),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CourseSelection(provider),
                         const SizedBox(height: 20.0),
@@ -80,6 +80,8 @@ class BookingPage extends ConsumerWidget {
                         const SizedBox(height: 20.0),
                         DateSelection(provider),
                         const SizedBox(height: 20.0),
+                        TimeSlotSelection(provider),
+                        const SizedBox(height: 40.0),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
