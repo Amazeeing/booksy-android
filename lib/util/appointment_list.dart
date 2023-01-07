@@ -14,8 +14,31 @@ class AppointmentCard extends StatefulWidget {
 }
 
 class _AppointmentCardState extends State<AppointmentCard> {
-  List<PopupMenuItem<String>> _getPopUpMenuEntries() {
-    List<PopupMenuItem<String>> entries = [
+  List<PopupMenuItem<String>> _getPopupMenuItems() {
+    return <PopupMenuItem<String>>[
+      PopupMenuItem<String>(
+          value: 'Effettua',
+          child: Row(
+            children: const [
+              Icon(Icons.check, color: Colors.green),
+              SizedBox(width: 10.0),
+              Text('Effettua')
+            ],
+          ),
+          onTap: () => setState(() {
+                try {
+                  widget.current.setAppointed();
+                } catch (e) {
+                  showDialog(
+                      context: context,
+                      builder: (context) => const AlertDialog(
+                            icon: Icon(Icons.warning_amber),
+                            title: Text('Errore'),
+                            content: Text(
+                                'Si e\' verificato un errore durante l\'effettuazione della prenotazione'),
+                          ));
+                }
+              })),
       PopupMenuItem<String>(
           value: 'Annulla',
           child: Row(children: const [
@@ -24,31 +47,36 @@ class _AppointmentCardState extends State<AppointmentCard> {
             Text('Annulla')
           ]),
           onTap: () => setState(() {
-            widget.current.setCancelled();
-          })
-      )
+                try {
+                  widget.current.setCancelled();
+                } catch (e) {
+                  showDialog(
+                      context: context,
+                      builder: (context) => const AlertDialog(
+                            icon: Icon(Icons.warning_amber),
+                            title: Text('Errore'),
+                            content: Text(
+                                'Si e\' verificato un errore durante la cancellazione della prenotazione'),
+                          ));
+                }
+              }))
     ];
+  }
 
-    if(widget.userRole == 'studente') {
-      entries.insert(0,
-        PopupMenuItem<String>(
-            value: 'Effettua',
-            enabled: widget.userRole == 'studente',
-            child: Row(
-              children: const [
-                Icon(Icons.check, color: Colors.green),
-                SizedBox(width: 10.0),
-                Text('Effettua')
-              ],
-            ),
-            onTap: () => setState(() {
-              widget.current.setAppointed();
-            })
-        )
-      );
+  Widget _getStatusChangeMenu() {
+    if (widget.userRole == 'amministratore') {
+      return IconButton(
+          icon: const Icon(Icons.close, color: Colors.red),
+          onPressed: () => setState(() {
+            widget.current.setCancelled();
+          }));
     }
 
-    return entries;
+    return PopupMenuButton(
+        offset: const Offset(-5.0, 5.0),
+        icon: const Icon(Icons.more_vert),
+        elevation: 5.0,
+        itemBuilder: (context) => _getPopupMenuItems());
   }
 
   @override
@@ -71,16 +99,9 @@ class _AppointmentCardState extends State<AppointmentCard> {
       style: TextStyle(color: statusColor[statusText]),
     );
 
-    final Widget statusChangeMenu = PopupMenuButton(
-        offset: const Offset(-5.0, 5.0),
-        icon: const Icon(Icons.more_vert),
-        elevation: 5.0,
-        itemBuilder: (context) => _getPopUpMenuEntries()
-    );
+    final Widget statusChangeMenu = _getStatusChangeMenu();
 
     return Card(
-      clipBehavior: Clip.antiAlias,
-      elevation: 5.0,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: GridTile(
@@ -107,11 +128,9 @@ class _AppointmentCardState extends State<AppointmentCard> {
                 children: [
                   Text(widget.current.fasciaOraria),
                   const SizedBox(width: 10.0),
-                  Text(
-                    widget.current.data,
-                    textScaleFactor: 0.75,
-                    style: TextStyle(color: Colors.grey[500])
-                  )
+                  Text(widget.current.data,
+                      textScaleFactor: 0.75,
+                      style: TextStyle(color: Colors.grey[500]))
                 ],
               ),
             ],
@@ -151,8 +170,7 @@ class AppointmentsList extends StatelessWidget {
           maxCrossAxisExtent: 350.0,
           childAspectRatio: 3.5 / 2.25,
           mainAxisSpacing: 20.0,
-          crossAxisSpacing: 20.0
-      ),
+          crossAxisSpacing: 20.0),
     );
   }
 }
