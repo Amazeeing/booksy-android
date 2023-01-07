@@ -73,10 +73,10 @@ class Prenotazione {
   }
 
   void setAppointed() {
-    effettuata = true;
-
     /* Richiesta a servlet di impostare la prenotazione come effettuata anche sul model (database) */
     _setAppointedDB();
+
+    effettuata = true;
   }
 
   Future<void> _setCancelledDB() async {
@@ -96,7 +96,7 @@ class Prenotazione {
     /* Imposta la prenotazione come cancellata nel DB */
     await client.post(Uri.http(
         'localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni', {
-      'action': 'impostaPrenotazioneAnnullata',
+      'action': 'rimuoviPrenoazione',
       'idCorso': corso,
       'emailDocente': docente,
       'data': data,
@@ -107,9 +107,9 @@ class Prenotazione {
   }
 
   void setCancelled() {
-    attiva = false;
-
     /* Richiesta a servlet di impostare la prenotazione come cancellata anche sul model (database) */
     _setCancelledDB();
+
+    attiva = false;
   }
 }
