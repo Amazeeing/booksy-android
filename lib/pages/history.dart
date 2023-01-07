@@ -59,7 +59,7 @@ class HistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(children: [
       const Text(
-        'Storico delle prenotazioni',
+        '🕖 Storico delle prenotazioni',
         textScaleFactor: 1.5,
       ),
       const SizedBox(height: 20.0),
@@ -71,7 +71,6 @@ class HistoryPage extends StatelessWidget {
             future: _fetchAppointments(user.ruolo),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
-                print(snapshot.error);
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
