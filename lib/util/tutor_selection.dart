@@ -8,7 +8,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:prenotazioni/model/docente.dart';
 import 'package:prenotazioni/util/fields_notifier.dart';
 
-Future<List<Docente>> _fetchTutorsByCourse(String name) async {
+Future<List<Docente>> _fetchTutorsByCourse(String? name) async {
+  if (name == null) {
+    return [];
+  }
+
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? username = prefs.getString('username');
   String? password = prefs.getString('password');
@@ -17,10 +21,11 @@ Future<List<Docente>> _fetchTutorsByCourse(String name) async {
 
   /* Autentico l'utente per poter rinnovare la sessione */
   await client.post(Uri.http(
-      'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
-      {'action': 'autenticaUtente',
-        'username': username,
-        'password': password}));
+      'localhost:8080', '/progetto_TWeb_war_exploded/autentica', {
+    'action': 'autenticaUtente',
+    'username': username,
+    'password': password
+  }));
 
   final response = await client.get(Uri.http(
       'localhost:8080',
@@ -41,46 +46,52 @@ List<Docente> _parseTutors(String responseBody) {
 class TutorSelection extends ConsumerWidget {
   const TutorSelection(this.fieldsProvider, {Key? key}) : super(key: key);
 
-  final StateNotifierProvider<FieldsNotifier, Map<String, String?>> fieldsProvider;
+  final StateNotifierProvider<FieldsNotifier, Map<String, String?>>
+      fieldsProvider;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     Map<String, String?> fields = ref.watch(fieldsProvider);
 
-    if (fields['course'] == null) {
-      return const Text('Nessun corso selezionato.');
-    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Seleziona un docente'),
+        const SizedBox(height: 10.0),
+        FutureBuilder<List<Docente>>(
+          future: _fetchTutorsByCourse(fields['course']),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return const Text('Impossibile reperire i docenti disponibili.');
+            } else if (snapshot.hasData) {
+              List<Docente> tutors = snapshot.data!;
+              return DropdownButtonFormField<String>(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Selezionare un docente.';
+                  }
 
-    return FutureBuilder<List<Docente>>(
-      future: _fetchTutorsByCourse(fields['course']!),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return const Text('Impossibile reperire i docenti disponibili.');
-        } else if (snapshot.hasData) {
-          return Column(
-            children: [
-              const Text('Seleziona un docente'),
-              const SizedBox(height: 10.0),
-              DropdownButtonFormField<String>(
+                  return null;
+                },
                 value: fields['tutor'],
-                disabledHint: Text('Nessun docente che insegni il corso ${fields['course']}'),
-                items: snapshot.data!.map((docente) {
+                items: tutors.map((docente) {
                   return DropdownMenuItem<String>(
-                    value: docente.nome,
+                    value: docente.email,
                     child: Text('${docente.nome} ${docente.cognome}'),
                   );
                 }).toList(),
                 onChanged: (value) {
                   ref.read(fieldsProvider.notifier).setTutor(value!);
                 },
+                menuMaxHeight: 200.0,
                 decoration: const InputDecoration(border: OutlineInputBorder()),
-              )
-            ],
-          );
-        } else {
-          return const CircularProgressIndicator();
-        }
-      },
+              );
+            } else {
+              return const CircularProgressIndicator();
+            }
+          },
+        )
+      ],
     );
   }
 }
