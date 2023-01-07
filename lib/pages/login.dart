@@ -116,7 +116,7 @@ class LoginPage extends StatelessWidget {
               const Text(
                 'Dai un boost alla tua carriera universitaria 🚀',
                 maxLines: 2,
-                textScaleFactor: 1.5,
+                textScaleFactor: 1.25,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 100.0),
