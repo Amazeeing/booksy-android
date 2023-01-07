@@ -15,6 +15,10 @@ Future<Utente?> _authenticateUser() async {
   String? username = prefs.getString('username');
   String? password = prefs.getString('password');
 
+  if(username == null || password == null) {
+    throw Exception('Primo accesso. Inserire i dati.');
+  }
+
   final response = await http.post(Uri.http(
       'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
       {'action': 'autenticaUtente',
@@ -48,7 +52,7 @@ class _AuthPageState extends State<AuthPage> {
         future: _authenticateUser(),
         builder: (context, snapshot) {
           if(snapshot.hasError) {
-            return LoginPage(error: snapshot.error.toString());
+            return LoginPage(error: snapshot.error is Exception ? null : snapshot.error.toString());
           } else if(snapshot.hasData) {
             return HomePage(snapshot.data!);
           } else {
