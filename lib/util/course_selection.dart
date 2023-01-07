@@ -53,22 +53,34 @@ class CourseSelection extends ConsumerWidget {
         if (snapshot.hasError) {
           return const Text('Impossibile reperire i corsi disponibili.');
         } else if (snapshot.hasData) {
-          return Column(children: [
-            const Text('Seleziona un corso'),
-            const SizedBox(height: 10.0),
-            DropdownButtonFormField<String>(
-                value: fields['course'],
-                items: snapshot.data!.map((corso) {
-                  return DropdownMenuItem<String>(
-                    value: corso.nome,
-                    child: Text(corso.nome),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  ref.read(fieldsProvider.notifier).setCourse(value!);
-                },
-                decoration: const InputDecoration(border: OutlineInputBorder()))
-          ]);
+          List<Corso> courses = snapshot.data!;
+          return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Seleziona un corso'),
+                const SizedBox(height: 10.0),
+                DropdownButtonFormField<String>(
+                    value: fields['course'],
+                    items: courses.map((corso) {
+                      return DropdownMenuItem<String>(
+                        value: corso.nome,
+                        child: Text(corso.nome),
+                      );
+                    }).toList(),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Selezionare un corso.';
+                      }
+
+                      return null;
+                    },
+                    onChanged: (value) {
+                      ref.read(fieldsProvider.notifier).setCourse(value!);
+                    },
+                    menuMaxHeight: 200.0,
+                    decoration:
+                        const InputDecoration(border: OutlineInputBorder()))
+              ]);
         } else {
           return const LinearProgressIndicator();
         }
