@@ -4,7 +4,6 @@ class FieldsNotifier extends StateNotifier<Map<String, String?>> {
   FieldsNotifier() : super({});
 
   void setCourse(String value) {
-    clear();
     state = {'course': value};
   }
 
