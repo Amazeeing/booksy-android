@@ -10,7 +10,8 @@ import 'package:prenotazioni/util/date_selection.dart';
 import 'package:prenotazioni/util/timeslot_selection.dart';
 import 'package:prenotazioni/util/fields_notifier.dart';
 
-final provider = StateNotifierProvider<FieldsNotifier, Map<String, String?>>((ref) {
+final provider =
+    StateNotifierProvider<FieldsNotifier, Map<String, String?>>((ref) {
   return FieldsNotifier();
 });
 
@@ -30,10 +31,11 @@ class BookingPage extends ConsumerWidget {
 
     /* Autentico l'utente per poter rinnovare la sessione */
     await client.post(Uri.http(
-        'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
-        {'action': 'autenticaUtente',
-          'username': username,
-          'password': password}));
+        'localhost:8080', '/progetto_TWeb_war_exploded/autentica', {
+      'action': 'autenticaUtente',
+      'username': username,
+      'password': password
+    }));
 
     await client.post(
         Uri.http('localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni', {
@@ -94,13 +96,15 @@ class BookingPage extends ConsumerWidget {
                             const SizedBox(width: 20.0),
                             ElevatedButton(
                                 onPressed: () {
-                                  if(_bookingFormKey.currentState!.validate()) {
+                                  if (_bookingFormKey.currentState!
+                                      .validate()) {
                                     _addAppointment(ref.read(provider));
-                                    Navigator.pushReplacementNamed(context, '/');
+                                    ref.read(provider.notifier).clear();
+                                    Navigator.pushReplacementNamed(
+                                        context, '/');
                                   }
                                 },
-                                child: const Text('Prenota')
-                            )
+                                child: const Text('Prenota'))
                           ],
                         )
                       ],
