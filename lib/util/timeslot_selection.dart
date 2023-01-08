@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:prenotazioni/util/fields_notifier.dart';
 
 Future<List<String>> _fetchAvailableSlots(String? tutor, String? date) async {
-  if(tutor == null || date == null) {
+  if (tutor == null || date == null) {
     return [];
   }
 
@@ -54,40 +54,40 @@ class TimeSlotSelection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     Map<String, String?> fields = ref.watch(fieldsProvider);
 
-    return FutureBuilder<List<String>>(
-        future: _fetchAvailableSlots(fields['tutor'], fields['date']),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return const Text(
-                'Impossibile reperire le fascie orarie per il docente selezionato.');
-          } else if (snapshot.hasData) {
-            List<String> timeSlots = snapshot.data!;
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Seleziona una fascia oraria'),
-                const SizedBox(height: 10.0),
-                DropdownButtonFormField(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Seleziona una fascia oraria'),
+        const SizedBox(height: 10.0),
+        FutureBuilder<List<String>>(
+            future: _fetchAvailableSlots(fields['tutor'], fields['date']),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return const Text(
+                    'Impossibile reperire le fascie orarie per il docente selezionato.');
+              } else if (snapshot.hasData) {
+                List<String> timeSlots = snapshot.data!;
+                return DropdownButtonFormField(
                   value: fields['timeSlot'],
-                    items: timeSlots.map((timeSlot) {
-                      return DropdownMenuItem<String>(
-                        value: timeSlot,
-                        child: Text(timeSlot),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      ref.read(fieldsProvider.notifier).setTime(value!);
-                    },
+                  items: timeSlots.map((timeSlot) {
+                    return DropdownMenuItem<String>(
+                      value: timeSlot,
+                      child: Text(timeSlot),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    ref.read(fieldsProvider.notifier).setTime(value!);
+                  },
                   menuMaxHeight: 200.0,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder()
-                  ),
-                )
-              ],
-            );
-          } else {
-            return const LinearProgressIndicator();
-          }
-        });
+                  decoration:
+                      const InputDecoration(border: OutlineInputBorder()),
+                );
+              } else {
+                return const LinearProgressIndicator();
+              }
+            },
+        )
+      ],
+    );
   }
 }

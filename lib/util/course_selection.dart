@@ -47,44 +47,42 @@ class CourseSelection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     Map<String, String?> fields = ref.watch(fieldsProvider);
 
-    return FutureBuilder<List<Corso>>(
-      future: _fetchCourses(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return const Text('Impossibile reperire i corsi disponibili.');
-        } else if (snapshot.hasData) {
-          List<Corso> courses = snapshot.data!;
-          return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Seleziona un corso'),
-                const SizedBox(height: 10.0),
-                DropdownButtonFormField<String>(
-                    value: fields['course'],
-                    items: courses.map((corso) {
-                      return DropdownMenuItem<String>(
-                        value: corso.nome,
-                        child: Text(corso.nome),
-                      );
-                    }).toList(),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Selezionare un corso.';
-                      }
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const Text('Seleziona un corso'),
+      const SizedBox(height: 10.0),
+      FutureBuilder<List<Corso>>(
+        future: _fetchCourses(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Text('Impossibile reperire i corsi disponibili.');
+          } else if (snapshot.hasData) {
+            List<Corso> courses = snapshot.data!;
+            return DropdownButtonFormField<String>(
+                value: fields['course'],
+                items: courses.map((corso) {
+                  return DropdownMenuItem<String>(
+                    value: corso.nome,
+                    child: Text(corso.nome),
+                  );
+                }).toList(),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Selezionare un corso.';
+                  }
 
-                      return null;
-                    },
-                    onChanged: (value) {
-                      ref.read(fieldsProvider.notifier).setCourse(value!);
-                    },
-                    menuMaxHeight: 200.0,
-                    decoration:
-                        const InputDecoration(border: OutlineInputBorder()))
-              ]);
-        } else {
-          return const LinearProgressIndicator();
-        }
-      },
-    );
+                  return null;
+                },
+                onChanged: (value) {
+                  ref.read(fieldsProvider.notifier).setCourse(value!);
+                },
+                menuMaxHeight: 200.0,
+                decoration:
+                    const InputDecoration(border: OutlineInputBorder()));
+          } else {
+            return const LinearProgressIndicator();
+          }
+        },
+      )
+    ]);
   }
 }
