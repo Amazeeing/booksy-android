@@ -59,6 +59,7 @@ class CourseSelection extends ConsumerWidget {
             List<Corso> courses = snapshot.data!;
             return DropdownButtonFormField<String>(
                 value: fields['course'],
+                disabledHint: const Text('Nessun corso trovato'),
                 items: courses.map((corso) {
                   return DropdownMenuItem<String>(
                     value: corso.nome,

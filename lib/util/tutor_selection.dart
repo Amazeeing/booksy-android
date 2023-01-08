@@ -66,6 +66,9 @@ class TutorSelection extends ConsumerWidget {
             } else if (snapshot.hasData) {
               List<Docente> tutors = snapshot.data!;
               return DropdownButtonFormField<String>(
+                disabledHint: fields['course'] != null
+                    ? const Text('Nessun docente trovato')
+                    : null,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Selezionare un docente.';
