@@ -44,7 +44,10 @@ class DateSelection extends ConsumerWidget {
               ref.read(fieldsProvider.notifier).setDate(parsedDate);
             }
           },
-          decoration: const InputDecoration(border: OutlineInputBorder()),
+          decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              suffixIcon: Icon(Icons.calendar_month)
+          ),
         )
       ],
     );
