@@ -16,15 +16,10 @@ Future<List<Corso>> _fetchCourses() async {
   http.Client client = http.Client();
 
   /* Autentico l'utente per poter rinnovare la sessione */
-  await client.post(Uri.http(
-      'localhost:8080', '/progetto_TWeb_war_exploded/autentica', {
-    'action': 'autenticaUtente',
-    'username': username,
-    'password': password
-  }));
-
-  final response = await client.get(Uri.http('localhost:8080',
-      'progetto_TWeb_war_exploded/corsi', {'action': 'ottieniCorsi'}));
+  final response = await client.get(Uri.http(
+      'localhost:8080',
+      'progetto_TWeb_war_exploded/mobile',
+      {'username': username, 'password': password, 'action': 'ottieniCorsi'}));
 
   client.close();
 

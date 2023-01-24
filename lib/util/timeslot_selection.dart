@@ -18,16 +18,10 @@ Future<List<String>> _fetchAvailableSlots(String? tutor, String? date) async {
 
   http.Client client = http.Client();
 
-  /* Autentico l'utente per poter rinnovare la sessione */
-  await client.post(Uri.http(
-      'localhost:8080', '/progetto_TWeb_war_exploded/autentica', {
-    'action': 'autenticaUtente',
-    'username': username,
-    'password': password
-  }));
-
   final response = await client.get(Uri.http(
-      'localhost:8080', '/progetto_TWeb_war_exploded/slot-disponibili', {
+      'localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
+    'username': username,
+    'password': password,
     'action': 'ottieniSlotDisponibiliDocente',
     'docente': tutor,
     'dataInizio': date
@@ -43,6 +37,7 @@ List<String> _parseAvailableSlots(String responseBody) {
 
   return List<String>.from(parsed);
 }
+
 
 class TimeSlotSelection extends ConsumerWidget {
   const TimeSlotSelection(this.fieldsProvider, {Key? key}) : super(key: key);

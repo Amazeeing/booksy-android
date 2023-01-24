@@ -26,15 +26,12 @@ class _HomePageState extends State<HomePage> {
 
     http.Client client = http.Client();
 
-    /* Autentico l'utente per poter rinnovare la sessione */
     await client.post(Uri.http(
-        'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
-        {'action': 'autenticaUtente',
-          'username': username,
-          'password': password}));
-
-    await client.post(Uri.http('localhost:8080',
-        'progetto_TWeb_war_exploded/autentica', {'action': 'scollegaUtente'}));
+        'localhost:8080', 'progetto_TWeb_war_exploded/autentica', {
+      'username': username,
+      'password': password,
+      'action': 'scollegaUtente'
+    }));
 
     client.close();
 
