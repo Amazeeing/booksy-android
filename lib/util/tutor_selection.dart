@@ -20,17 +20,13 @@ Future<List<Docente>> _fetchTutorsByCourse(String? name) async {
   http.Client client = http.Client();
 
   /* Autentico l'utente per poter rinnovare la sessione */
-  await client.post(Uri.http(
-      'localhost:8080', '/progetto_TWeb_war_exploded/autentica', {
-    'action': 'autenticaUtente',
+  final response = await client
+      .get(Uri.http('localhost:8080', '/progetto_TWeb_war_exploded/docenti', {
     'username': username,
-    'password': password
+    'password': password,
+    'action': 'filtraDocentePerCorso',
+    'corso': name
   }));
-
-  final response = await client.get(Uri.http(
-      'localhost:8080',
-      '/progetto_TWeb_war_exploded/docenti',
-      {'action': 'filtraDocentePerCorso', 'corso': name}));
 
   client.close();
 

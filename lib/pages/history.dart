@@ -8,8 +8,8 @@ import 'package:prenotazioni/model/utente.dart';
 import 'package:prenotazioni/model/prenotazione.dart';
 import 'package:prenotazioni/util/appointment_list.dart';
 
-/* Una map per legare il ruolo dell' utente all'URL dove ottenere
-le prenotazioni a lui rilevanti */
+/* Una map per legare il ruolo dell'utente all'URL dove ottenere
+le prenotazioni a esso rilevanti */
 const Map<String, String> _appointmentURL = {
   'studente': 'ottieniStoricoPrenotazioniUtente',
   'amministratore': 'ottieniTuttePrenotazioni'
@@ -22,18 +22,13 @@ Future<List<Prenotazione>> _fetchAppointments(String userRole) async {
 
   http.Client client = http.Client();
 
-  /* Autentico l'utente per poter rinnovare la sessione */
-  await client.post(Uri.http(
-      'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
-      {'action': 'autenticaUtente',
-        'username': username,
-        'password': password}));
-
   /* Ottengo le prenotazioni rilevanti al ruolo dell'utente */
   String appointmentsURL = _appointmentURL[userRole]!;
   final response = await client.get(Uri.http(
-      'localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni',
-      {'action': appointmentsURL}));
+      'localhost:8080', '/progetto_TWeb_war_exploded/mobile',
+      {'username': username,
+        'password': password,
+        'action': appointmentsURL}));
 
   client.close();
 

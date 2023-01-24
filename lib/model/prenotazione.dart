@@ -32,7 +32,8 @@ class Prenotazione {
         fasciaOraria: json['fasciaOraria'],
         dataCancellazione: json['dataCancellazione'],
         attiva: json['attiva'],
-        effettuata: json['effettuata']);
+        effettuata: json['effettuata']
+    );
   }
 
   Map<String, dynamic> toJson() => {
@@ -53,16 +54,11 @@ class Prenotazione {
 
     http.Client client = http.Client();
 
-    /* Autentico l'utente per poter rinnovare la sessione */
-    await client.post(Uri.http(
-        'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
-        {'action': 'autenticaUtente',
-          'username': username,
-          'password': password}));
-
     /* Imposto la prenotazione come effettuata nel DB */
     await client.post(Uri.http(
         'localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni', {
+      'username': username,
+      'password': password,
       'action': 'impostaPrenotazioneEffettuata',
       'emailDocente': docente,
       'data': data,
@@ -86,16 +82,11 @@ class Prenotazione {
 
     http.Client client = http.Client();
 
-    /* Autentico l'utente per poter rinnovare la sessione */
-    await client.post(Uri.http(
-        'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
-        {'action': 'autenticaUtente',
-          'username': username,
-          'password': password}));
-
     /* Imposta la prenotazione come cancellata nel DB */
     await client.post(Uri.http(
         'localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni', {
+          'username': username,
+      'password': password,
       'action': 'rimuoviPrenoazione',
       'idCorso': corso,
       'emailDocente': docente,
