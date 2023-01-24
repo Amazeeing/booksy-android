@@ -35,8 +35,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
                             icon: Icon(Icons.warning_amber),
                             title: Text('Errore'),
                             content: Text(
-                                'Si e\' verificato un errore durante l\'effettuazione della prenotazione'),
-                          ));
+                                'Si e\' verificato un errore durante l\'effettuazione della prenotazione'
+                            ),
+                      )
+                  );
                 }
               })),
       PopupMenuItem<String>(
@@ -59,7 +61,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
                                 'Si e\' verificato un errore durante la cancellazione della prenotazione'),
                           ));
                 }
-              }))
+              })
+      )
     ];
   }
 
@@ -170,7 +173,8 @@ class AppointmentsList extends StatelessWidget {
           maxCrossAxisExtent: 350.0,
           childAspectRatio: 3.5 / 2.25,
           mainAxisSpacing: 20.0,
-          crossAxisSpacing: 20.0),
+          crossAxisSpacing: 20.0
+      ),
     );
   }
 }
