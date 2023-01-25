@@ -107,26 +107,34 @@ class LoginPage extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         minimum: const EdgeInsets.symmetric(vertical: 25.0, horizontal: 50.0),
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset('assets/logo.png', fit: BoxFit.contain),
-              const SizedBox(height: 20.0),
-              const Text(
-                'Dai un boost alla tua carriera universitaria 🚀',
-                maxLines: 2,
-                textScaleFactor: 1.25,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 100.0),
-              const Text(
-                'Effettua l\'accesso',
-                textScaleFactor: 1.5,
-              ),
-              const SizedBox(height: 20.0),
-              LoginForm(error: error)
-            ]),
+        child: LayoutBuilder(builder: (context, viewportConstraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints:
+                  BoxConstraints(maxHeight: viewportConstraints.maxHeight),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset('assets/logo.png', fit: BoxFit.contain),
+                    const SizedBox(height: 20.0),
+                    const Text(
+                      'Dai un boost alla tua carriera universitaria 🚀',
+                      maxLines: 2,
+                      textScaleFactor: 1.25,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 100.0),
+                    const Text(
+                      'Effettua l\'accesso',
+                      textScaleFactor: 1.5,
+                    ),
+                    const SizedBox(height: 20.0),
+                    LoginForm(error: error)
+                  ]),
+            ),
+          );
+        }),
       ),
     );
   }
