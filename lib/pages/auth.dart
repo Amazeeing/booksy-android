@@ -14,7 +14,6 @@ Future<Utente?> _authenticateUser() async {
   /* Ottengo gli username e password salvati in precedenza */
   String? username = prefs.getString('username');
   String? password = prefs.getString('password');
-
   if(username == null || password == null) {
     throw Exception('Primo accesso. Inserire i dati.');
   }
@@ -26,6 +25,9 @@ Future<Utente?> _authenticateUser() async {
         'password': password}));
 
   String userData = response.body;
+  if(userData == 'null') {
+    throw Exception('Credenziali errate: per favore riprova.');
+  }
 
   /* Converto la risposta da formato JSON a un oggetto di tipo Utente */
   return _parseUserData(userData);
@@ -52,7 +54,8 @@ class _AuthPageState extends State<AuthPage> {
         future: _authenticateUser(),
         builder: (context, snapshot) {
           if(snapshot.hasError) {
-            return LoginPage(error: snapshot.error is Exception ? null : snapshot.error.toString());
+            String loginError = snapshot.error.toString();
+            return LoginPage(error: loginError);
           } else if(snapshot.hasData) {
             return HomePage(snapshot.data!);
           } else {
