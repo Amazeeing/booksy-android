@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:prenotazioni/pages/available_slots.dart';
 import 'package:prenotazioni/pages/welcome.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -36,10 +37,21 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> pages = [
-      WelcomePage(widget.user),
+    List<Widget> pages = [
+      AvailableSlotsPage(widget.user),
       HistoryPage(widget.user)
     ];
+
+    List<BottomNavigationBarItem> navigationBarItems = const [
+      BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: 'Disponibilità'),
+      BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Storico')
+    ];
+
+    if (widget.user.ruolo == 'studente') {
+      pages.insert(0, WelcomePage(widget.user));
+      navigationBarItems.insert(
+          0, const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'));
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -79,10 +91,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Storico')
-        ],
+        items: navigationBarItems,
         currentIndex: _selectedIndex,
         onTap: (index) {
           setState(() {
