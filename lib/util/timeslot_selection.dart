@@ -16,9 +16,7 @@ Future<List<String>> _fetchAvailableSlots(String? tutor, String? date) async {
   String? username = prefs.getString('username');
   String? password = prefs.getString('password');
 
-  http.Client client = http.Client();
-
-  final response = await client.get(Uri.http(
+  final response = await http.get(Uri.http(
       'localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
     'username': username,
     'password': password,
@@ -26,8 +24,6 @@ Future<List<String>> _fetchAvailableSlots(String? tutor, String? date) async {
     'docente': tutor,
     'dataInizio': date
   }));
-
-  client.close();
 
   return _parseAvailableSlots(response.body);
 }

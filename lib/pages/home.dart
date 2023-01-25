@@ -24,16 +24,12 @@ class _HomePageState extends State<HomePage> {
     String? username = prefs.getString('username');
     String? password = prefs.getString('password');
 
-    http.Client client = http.Client();
-
-    await client.post(Uri.http(
+    await http.post(Uri.http(
         'localhost:8080', 'progetto_TWeb_war_exploded/autentica', {
       'username': username,
       'password': password,
       'action': 'scollegaUtente'
     }));
-
-    client.close();
 
     prefs.clear();
   }

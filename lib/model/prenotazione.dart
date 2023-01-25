@@ -52,11 +52,9 @@ class Prenotazione {
     String? username = prefs.getString('username');
     String? password = prefs.getString('password');
 
-    http.Client client = http.Client();
-
     /* Imposto la prenotazione come effettuata nel DB */
-    await client.post(Uri.http(
-        'localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni', {
+    await http.post(Uri.http(
+        'localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
       'username': username,
       'password': password,
       'action': 'impostaPrenotazioneEffettuata',
@@ -64,8 +62,6 @@ class Prenotazione {
       'data': data,
       'fasciaOraria': fasciaOraria
     }));
-
-    client.close();
   }
 
   void setAppointed() {
@@ -80,11 +76,9 @@ class Prenotazione {
     String? username = prefs.getString('username');
     String? password = prefs.getString('password');
 
-    http.Client client = http.Client();
-
     /* Imposta la prenotazione come cancellata nel DB */
-    await client.post(Uri.http(
-        'localhost:8080', '/progetto_TWeb_war_exploded/prenotazioni', {
+    await http.post(Uri.http(
+        'localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
           'username': username,
       'password': password,
       'action': 'rimuoviPrenoazione',
@@ -93,8 +87,6 @@ class Prenotazione {
       'data': data,
       'fasciaOraria': fasciaOraria
     }));
-
-    client.close();
   }
 
   void setCancelled() {

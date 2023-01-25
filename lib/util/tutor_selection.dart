@@ -17,18 +17,14 @@ Future<List<Docente>> _fetchTutorsByCourse(String? name) async {
   String? username = prefs.getString('username');
   String? password = prefs.getString('password');
 
-  http.Client client = http.Client();
-
   /* Autentico l'utente per poter rinnovare la sessione */
-  final response = await client
+  final response = await http
       .get(Uri.http('localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
     'username': username,
     'password': password,
     'action': 'filtraDocentePerCorso',
     'corso': name
   }));
-
-  client.close();
 
   return _parseTutors(response.body);
 }

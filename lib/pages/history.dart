@@ -20,17 +20,13 @@ Future<List<Prenotazione>> _fetchAppointments(String userRole) async {
   String? username = prefs.getString('username');
   String? password = prefs.getString('password');
 
-  http.Client client = http.Client();
-
   /* Ottengo le prenotazioni rilevanti al ruolo dell'utente */
   String appointmentsURL = _appointmentURL[userRole]!;
-  final response = await client.get(Uri.http(
+  final response = await http.get(Uri.http(
       'localhost:8080', '/progetto_TWeb_war_exploded/mobile',
       {'username': username,
         'password': password,
         'action': appointmentsURL}));
-
-  client.close();
 
   /* Faccio il parsing da JSON a una lista contenente oggetti di tipo Prenotazione */
   return _parseAppointments(response.body);

@@ -27,9 +27,7 @@ class BookingPage extends ConsumerWidget {
     String? username = prefs.getString('username');
     String? password = prefs.getString('password');
 
-    http.Client client = http.Client();
-
-    await client
+    await http
         .post(Uri.http('localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
       'username': username,
       'password': password,
@@ -39,8 +37,6 @@ class BookingPage extends ConsumerWidget {
       'data': fields['date'],
       'fasciaOraria': fields['time']
     }));
-
-    client.close();
   }
 
   @override
@@ -58,7 +54,6 @@ class BookingPage extends ConsumerWidget {
           child: Form(
             key: _bookingFormKey,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
                   'Prenota una ripetizione',
