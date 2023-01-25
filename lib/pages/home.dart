@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => BookingPage(widget.user)))
+                    builder: (context) => BookingPage()))
           },
           label: const Text('Prenota'),
           icon: const Icon(Icons.add),

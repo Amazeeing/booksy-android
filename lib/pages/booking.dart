@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:prenotazioni/model/utente.dart';
 import 'package:prenotazioni/util/course_selection.dart';
 import 'package:prenotazioni/util/tutor_selection.dart';
 import 'package:prenotazioni/util/date_selection.dart';
@@ -16,9 +15,7 @@ final provider =
 });
 
 class BookingPage extends ConsumerWidget {
-  BookingPage(this.user, {Key? key}) : super(key: key);
-
-  final Utente user;
+  BookingPage({Key? key}) : super(key: key);
 
   final GlobalKey<FormState> _bookingFormKey = GlobalKey<FormState>();
 
