@@ -77,11 +77,11 @@ class _LoginFormState extends State<LoginForm> {
               child: const Text('Registrati')),
           Visibility(
             visible: widget.error != null,
-            child: const Text(
-              'Si è verificato un\'errore durante l\'accesso. Riprovare.',
+            child: Text(
+              widget.error!,
               maxLines: 3,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.red),
+              style: const TextStyle(color: Colors.red),
             ),
           )
         ],

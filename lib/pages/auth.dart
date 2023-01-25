@@ -15,14 +15,19 @@ Future<Utente?> _authenticateUser() async {
   String? username = prefs.getString('username');
   String? password = prefs.getString('password');
   if(username == null || password == null) {
-    throw Exception('Primo accesso. Inserire i dati.');
+    throw Error();
   }
 
-  final response = await http.post(Uri.http(
-      'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
-      {'action': 'autenticaUtente',
-        'username': username,
-        'password': password}));
+  final http.Response response;
+  try {
+    response = await http.post(Uri.http(
+        'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
+        {'action': 'autenticaUtente',
+          'username': username,
+          'password': password}));
+  } catch (e) {
+    throw Exception('Impossibile comunicare con Booksy: riprovare più tardi.');
+  }
 
   String userData = response.body;
   if(userData == 'null') {
