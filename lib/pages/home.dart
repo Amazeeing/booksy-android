@@ -35,6 +35,8 @@ class _HomePageState extends State<HomePage> {
     prefs.clear();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     List<Widget> pages = [
@@ -42,9 +44,9 @@ class _HomePageState extends State<HomePage> {
       HistoryPage(widget.user)
     ];
 
-    List<BottomNavigationBarItem> navigationBarItems = const [
-      BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: 'Disponibilità'),
-      BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Storico')
+    List<BottomNavigationBarItem> navigationBarItems = [
+      const BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: 'Disponibilità'),
+      const BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Storico')
     ];
 
     if (widget.user.ruolo == 'studente') {
