@@ -45,7 +45,6 @@ class DateSelection extends ConsumerWidget {
             }
           },
           decoration: const InputDecoration(
-              border: OutlineInputBorder(),
               suffixIcon: Icon(Icons.calendar_month)
           ),
         )

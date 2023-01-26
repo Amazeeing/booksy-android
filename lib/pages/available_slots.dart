@@ -135,7 +135,9 @@ class _AvailableSlotsPageState extends State<AvailableSlotsPage> {
                     const SizedBox(width: 10.0),
                     ConstrainedBox(
                       constraints: const BoxConstraints(
-                          maxWidth: 500.0, maxHeight: 50.0),
+                          maxWidth: 500.0,
+                          maxHeight: 50.0
+                      ),
                       child: DropdownButtonFormField<String>(
                         items: tutors.map((docente) {
                           return DropdownMenuItem<String>(
@@ -149,7 +151,6 @@ class _AvailableSlotsPageState extends State<AvailableSlotsPage> {
                           });
                         },
                         menuMaxHeight: 200.0,
-                        decoration: const InputDecoration(border: OutlineInputBorder()),
                       ),
                     )
                   ],
@@ -167,7 +168,18 @@ class _AvailableSlotsPageState extends State<AvailableSlotsPage> {
                 future: _fetchAvailableSlots(),
                 builder: (context, snapshot) {
                   if(snapshot.hasError) {
-                    return const Text('Impossibile reperire i slot disponibili per il docente selezionato.');
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.question_mark_sharp, size: 80),
+                        SizedBox(height: 10.0),
+                        Text(
+                          'Impossibile reperire le ripetizioni disponibili.\nRiprova più tardi.',
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    );
                   } else if(snapshot.hasData) {
                     List<SlotDisponibile> tutorAvailableSlots = _buildAvailableSlotsList(selected, snapshot.data![selected]!);
                     return SlotList(tutorAvailableSlots);

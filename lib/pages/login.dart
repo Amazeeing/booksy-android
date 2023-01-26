@@ -35,8 +35,7 @@ class _LoginFormState extends State<LoginForm> {
       child: Column(
         children: [
           TextFormField(
-            decoration: const InputDecoration(
-                hintText: 'Username', border: OutlineInputBorder()),
+            decoration: const InputDecoration(hintText: 'Username'),
             validator: (String? value) {
               if (value == null || value.isEmpty) {
                 return 'Il campo username non può essere vuoto.';
@@ -49,8 +48,7 @@ class _LoginFormState extends State<LoginForm> {
           const SizedBox(height: 12.0),
           TextFormField(
             obscureText: true,
-            decoration: const InputDecoration(
-                hintText: 'Password', border: OutlineInputBorder()),
+            decoration: const InputDecoration(hintText: 'Password'),
             validator: (String? value) {
               if (value == null || value.isEmpty) {
                 return 'Il campo password non può essere vuoto.';

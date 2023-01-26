@@ -27,6 +27,9 @@ ThemeData getBooksyTheme() {
       textTheme: _getBooksyTextTheme(base.textTheme),
       cardTheme: base.cardTheme.copyWith(
         elevation: 5.0,
-      )
+      ),
+    inputDecorationTheme: base.inputDecorationTheme.copyWith(
+      border: const OutlineInputBorder()
+    )
   );
 }

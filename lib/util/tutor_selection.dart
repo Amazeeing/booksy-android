@@ -78,8 +78,7 @@ class TutorSelection extends ConsumerWidget {
                 onChanged: (value) {
                   ref.read(fieldsProvider.notifier).setTutor(value!);
                 },
-                menuMaxHeight: 200.0,
-                decoration: const InputDecoration(border: OutlineInputBorder()),
+                menuMaxHeight: 200.0
               );
             } else {
               return const CircularProgressIndicator();
