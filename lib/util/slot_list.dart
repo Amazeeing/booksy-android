@@ -53,6 +53,10 @@ class SlotList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if(slots.isEmpty) {
+      return const Text('Nessuna ripetizione disponibile per il docente selezionato.');
+    }
+
     return GridView.builder(
       itemCount: slots.length,
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
