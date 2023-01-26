@@ -75,15 +75,7 @@ class _LoginFormState extends State<LoginForm> {
           TextButton(
               onPressed: () => {Navigator.pushNamed(context, '/register')},
               child: const Text('Registrati')),
-          Visibility(
-            visible: widget.error != null,
-            child: Text(
-              widget.error!,
-              maxLines: 3,
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.red),
-            ),
-          )
+          Text((widget.error != null) ? widget.error! : '')
         ],
       ),
     );

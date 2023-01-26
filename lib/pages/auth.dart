@@ -15,7 +15,7 @@ Future<Utente?> _authenticateUser() async {
   String? username = prefs.getString('username');
   String? password = prefs.getString('password');
   if(username == null || password == null) {
-    throw Error();
+    return null;
   }
 
   final http.Response response;
@@ -58,8 +58,8 @@ class _AuthPageState extends State<AuthPage> {
       body: FutureBuilder<Utente?>(
         future: _authenticateUser(),
         builder: (context, snapshot) {
-          if(snapshot.hasError) {
-            String loginError = snapshot.error.toString();
+          if(snapshot.hasError || snapshot.data == null) {
+            String? loginError = (snapshot.data != null) ? snapshot.error.toString() : null;
             return LoginPage(error: loginError);
           } else if(snapshot.hasData) {
             return HomePage(snapshot.data!);
