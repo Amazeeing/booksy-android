@@ -47,37 +47,22 @@ class SlotCard extends StatelessWidget {
 }
 
 class SlotList extends StatelessWidget {
-  const SlotList(this.tutor, this.slots, {Key? key}) : super(key: key);
+  const SlotList(this.slots, {Key? key}) : super(key: key);
 
-  final String tutor;
-  final Map<String, List<String>> slots;
-
-  List<SlotDisponibile> _buildAvailableSlotsList(Map<String, List<String>> slots) {
-    List<SlotDisponibile> availableSlots = [];
-
-    for(var slot in slots.entries) {
-      for(var timeSlot in slot.value) {
-        availableSlots.add(SlotDisponibile(docente: tutor, data: slot.key, fasciaOraria: timeSlot));
-      }
-    }
-
-    return availableSlots;
-  }
+  final List<SlotDisponibile> slots;
 
   @override
   Widget build(BuildContext context) {
-    List<SlotDisponibile> availableSlots = _buildAvailableSlotsList(slots);
-
     return GridView.builder(
-      scrollDirection: Axis.horizontal,
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+      itemCount: slots.length,
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: 200.0,
           childAspectRatio: 3.5 / 2.25,
           mainAxisSpacing: 20.0,
           crossAxisSpacing: 20.0
         ),
         itemBuilder: (context, index) {
-          return SlotCard(availableSlots[index]);
+          return SlotCard(slots[index]);
         }
     );
   }

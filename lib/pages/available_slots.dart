@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-import 'package:prenotazioni/model/docente.dart';
-import 'package:prenotazioni/util/slot_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:prenotazioni/model/utente.dart';
+import 'package:prenotazioni/model/docente.dart';
+import 'package:prenotazioni/model/slot_disponibile.dart';
+import 'package:prenotazioni/util/slot_list.dart';
 
 Future<List<Docente>> _fetchAvailableTutors() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -14,8 +14,8 @@ Future<List<Docente>> _fetchAvailableTutors() async {
   String? password = prefs.getString('password');
 
   /* Autentico l'utente per poter rinnovare la sessione */
-  final response = await http
-      .get(Uri.http('localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
+  final response = await http.get(Uri.http(
+      'localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
     'username': username,
     'password': password,
     'action': 'ottieniDocentiLiberi'
@@ -30,7 +30,8 @@ List<Docente> _parseTutors(String responseBody) {
   return parsed.map<Docente>((json) => Docente.fromJson(json)).toList();
 }
 
-Map<String, Map<String, List<String>>> _parseAvailableSlots(String responseBody) {
+Map<String, Map<String, List<String>>> _parseAvailableSlots(
+    String responseBody) {
   final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
 
   return Map<String, Map<String, List<String>>>.from(parsed);
@@ -41,7 +42,8 @@ Future<Map<String, Map<String, List<String>>>> _fetchAvailableSlots() async {
   String? username = prefs.getString('username');
   String? password = prefs.getString('password');
 
-  final response = await http.get(Uri.http('localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
+  final response = await http
+      .get(Uri.http('localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
     'username': username,
     'password': password,
     'action': 'ottieniSlotDisponibili',
@@ -52,9 +54,9 @@ Future<Map<String, Map<String, List<String>>>> _fetchAvailableSlots() async {
   return _parseAvailableSlots(response.body);
 }
 
-
 class SlotCard extends StatelessWidget {
-  const SlotCard(this.corso, this.data, this.fasciaOraria, {Key? key}) : super(key: key);
+  const SlotCard(this.corso, this.data, this.fasciaOraria, {Key? key})
+      : super(key: key);
 
   final String corso, data, fasciaOraria;
 
@@ -76,8 +78,7 @@ class SlotCard extends StatelessWidget {
                   const SizedBox(width: 10.0),
                   Text(data,
                       textScaleFactor: 0.75,
-                      style: TextStyle(color: Colors.grey[500])
-                  )
+                      style: TextStyle(color: Colors.grey[500]))
                 ],
               ),
             ],
@@ -100,58 +101,83 @@ class AvailableSlotsPage extends StatefulWidget {
 class _AvailableSlotsPageState extends State<AvailableSlotsPage> {
   String? selected;
 
+  List<SlotDisponibile> _buildAvailableSlotsList(String? tutor, Map<String, List<String>> slots) {
+    List<SlotDisponibile> availableSlots = [];
+
+    for (var slot in slots.entries) {
+      for (var timeSlot in slot.value) {
+        availableSlots.add(SlotDisponibile(
+            docente: tutor!, data: slot.key, fasciaOraria: timeSlot)
+        );
+      }
+    }
+
+    return availableSlots;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text('Benvenuto ${widget.user.nome}! 👋', textScaleFactor: 1.5),
+        const Text('📅 Ripetizioni disponibili', textScaleFactor: 1.5),
         const SizedBox(height: 20.0),
-        const Text('📅 Ripetizioni disponibili'),
         FutureBuilder<List<Docente>>(
-          future: _fetchAvailableTutors(),
-          builder: (context, snapshot) {
-            if(snapshot.hasError) {
-              return const Text('Impossibile reperire i docenti.');
-            } else if(snapshot.hasData) {
-              List<Docente> tutors = snapshot.data!;
-              return Column(
-                children: [
-                  const Text('Seleziona un docente'),
-                  DropdownButton<String>(
-                      items: tutors.map((docente) {
-                        return DropdownMenuItem<String>(
-                          value: docente.email,
-                          child: Text('${docente.nome} ${docente.cognome}'),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        selected = value;
-                      }
-                  ),
-                  const Divider(thickness: 2.0),
-                  Expanded(
-                      child: FutureBuilder<Map<String, Map<String, List<String>>>>(
-                        future: _fetchAvailableSlots(),
-                        builder: (context, snapshot) {
-                          if(snapshot.hasError) {
-                            return const Text('Impossibile reperire le ripetizioni disponibili');
-                          } else if(snapshot.hasData) {
-                            Map<String, List<String>> slots = snapshot.data![selected]!;
-                            return SlotList(selected!, slots);
-                          } else {
-                            return const CircularProgressIndicator();
-                          }
+            future: _fetchAvailableTutors(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return const Text('Impossibile reperire i docenti.');
+              } else if (snapshot.hasData) {
+                List<Docente> tutors = snapshot.data!;
+                return Row(
+                  children: [
+                    const Text('Docente:'),
+                    const SizedBox(width: 10.0),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(
+                          maxWidth: 500.0, maxHeight: 50.0),
+                      child: DropdownButtonFormField<String>(
+                        items: tutors.map((docente) {
+                          return DropdownMenuItem<String>(
+                            value: docente.email,
+                            child: Text('${docente.nome} ${docente.cognome}'),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selected = value;
+                          });
                         },
-                      )
-                  )
-                ],
-              );
-            } else {
-              return const LinearProgressIndicator();
-            }
-          }
+                        menuMaxHeight: 200.0,
+                        decoration: const InputDecoration(border: OutlineInputBorder()),
+                      ),
+                    )
+                  ],
+                );
+              } else {
+                return const LinearProgressIndicator();
+              }
+            }),
+        Expanded(
+          child: Center(
+              child: FutureBuilder<Map<String, Map<String, List<String>>>>(
+                future: _fetchAvailableSlots(),
+                builder: (context, snapshot) {
+                  if(snapshot.hasError) {
+                    return const Text('Impossibile reperire i slot disponibili per il docente selezionato.');
+                  } else if(snapshot.hasData) {
+                    List<SlotDisponibile> tutorAvailableSlots = _buildAvailableSlotsList(selected, snapshot.data![selected]!);
+                    return SlotList(tutorAvailableSlots);
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
+                },
+              )
+          ),
         ),
+        const SizedBox(height: 10.0),
+        const Divider(thickness: 2.0),
+        const SizedBox(height: 10.0),
       ],
     );
   }
