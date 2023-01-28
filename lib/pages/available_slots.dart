@@ -54,41 +54,6 @@ Future<Map<String, Map<String, List<String>>>> _fetchAvailableSlots() async {
   return _parseAvailableSlots(response.body);
 }
 
-class SlotCard extends StatelessWidget {
-  const SlotCard(this.corso, this.data, this.fasciaOraria, {Key? key})
-      : super(key: key);
-
-  final String corso, data, fasciaOraria;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: GridTile(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(corso, textScaleFactor: 1.25),
-              const SizedBox(height: 10.0),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(fasciaOraria),
-                  const SizedBox(width: 10.0),
-                  Text(data,
-                      textScaleFactor: 0.75,
-                      style: TextStyle(color: Colors.grey[500]))
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class AvailableSlotsPage extends StatefulWidget {
   const AvailableSlotsPage(this.user, {Key? key}) : super(key: key);
 
