@@ -3,9 +3,10 @@ import 'package:prenotazioni/model/slot_disponibile.dart';
 import 'package:prenotazioni/pages/booking.dart';
 
 class SlotCard extends StatelessWidget {
-  const SlotCard(this.current, {Key? key}) : super(key: key);
+  const SlotCard(this.current, this.isAdmin, {Key? key}) : super(key: key);
 
   final SlotDisponibile current;
+  final bool isAdmin;
 
   @override
   Widget build(BuildContext context) {
@@ -14,14 +15,17 @@ class SlotCard extends StatelessWidget {
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) => BookingPage()))
             },
-        child: const Text('Prenota')
-    );
+        child: const Text('Prenota'));
 
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: GridTile(
-          footer: Align(alignment: Alignment.bottomRight, child: appointButton),
+          footer: Visibility(
+            visible: isAdmin == false,
+              child: Align(
+                  alignment: Alignment.centerRight, child: appointButton)
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -46,25 +50,30 @@ class SlotCard extends StatelessWidget {
 }
 
 class SlotList extends StatelessWidget {
-  const SlotList(this.slots, {Key? key}) : super(key: key);
+  const SlotList(this.slots, this.isAdmin, {Key? key}) : super(key: key);
 
   final List<SlotDisponibile> slots;
+  final bool isAdmin;
 
   @override
   Widget build(BuildContext context) {
     if (slots.isEmpty) {
       return const Text(
-          'Nessuna ripetizione disponibile per il docente selezionato.');
+          'Nessuna ripetizione disponibile per il docente selezionato.',
+          maxLines: 2,
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.grey)
+      );
     }
 
     return GridView.builder(
       itemCount: slots.length,
       itemBuilder: (context, index) {
-        return SlotCard(slots[index]);
+        return SlotCard(slots[index], isAdmin);
       },
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 200.0,
-          childAspectRatio: 3.5 / 2.25,
+          maxCrossAxisExtent: 350.0,
+          childAspectRatio: 3.0 / 1.0,
           mainAxisSpacing: 20.0,
           crossAxisSpacing: 20.0),
     );
