@@ -75,7 +75,7 @@ class HistoryPage extends StatelessWidget {
                   ],
                 );
               } else if (snapshot.hasData) {
-                return AppointmentsList(snapshot.data!, user.ruolo);
+                return AppointmentsList(snapshot.data!, user.ruolo == 'amministratore');
               } else {
                 return const CircularProgressIndicator();
               }
