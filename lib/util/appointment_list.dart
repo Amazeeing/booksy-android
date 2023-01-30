@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:prenotazioni/model/prenotazione.dart';
 
 class AppointmentCard extends StatefulWidget {
-  const AppointmentCard(this.current, this.userRole, {Key? key})
+  const AppointmentCard(this.current, this.isAdmin, {Key? key})
       : super(key: key);
 
   final Prenotazione current;
-  final String userRole;
+  final bool isAdmin;
 
   @override
   State<AppointmentCard> createState() => _AppointmentCardState();
@@ -67,12 +67,13 @@ class _AppointmentCardState extends State<AppointmentCard> {
   }
 
   Widget _getStatusChangeMenu() {
-    if (widget.userRole == 'amministratore') {
+    if (widget.isAdmin) {
       return IconButton(
           icon: const Icon(Icons.close, color: Colors.red),
           onPressed: () => setState(() {
             widget.current.setCancelled();
-          }));
+          })
+      );
     }
 
     return PopupMenuButton(
@@ -145,11 +146,11 @@ class _AppointmentCardState extends State<AppointmentCard> {
 }
 
 class AppointmentsList extends StatelessWidget {
-  const AppointmentsList(this.appointments, this.userRole, {Key? key})
+  const AppointmentsList(this.appointments, this.isAdmin, {Key? key})
       : super(key: key);
 
   final List<Prenotazione> appointments;
-  final String userRole;
+  final bool isAdmin;
 
   @override
   Widget build(BuildContext context) {
@@ -167,10 +168,10 @@ class AppointmentsList extends StatelessWidget {
     return GridView.builder(
       itemCount: appointments.length,
       itemBuilder: (context, index) {
-        return AppointmentCard(appointments[index], userRole);
+        return AppointmentCard(appointments[index], isAdmin);
       },
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 350.0,
+          maxCrossAxisExtent: 600.0,
           childAspectRatio: 3.5 / 2.25,
           mainAxisSpacing: 20.0,
           crossAxisSpacing: 20.0
