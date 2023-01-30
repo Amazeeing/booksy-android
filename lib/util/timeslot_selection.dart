@@ -16,11 +16,11 @@ Future<List<String>> _fetchAvailableSlots(String? tutor, String? date) async {
   String? username = prefs.getString('username');
   String? password = prefs.getString('password');
 
-  final response = await http.get(Uri.http(
-      'localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
+  final response = await http
+      .get(Uri.http('localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
     'username': username,
     'password': password,
-    'action': 'ottieniSlotDisponibiliDocente',
+    'action': 'ottieniSlotDisponibiliDocenteData',
     'docente': tutor,
     'dataInizio': date
   }));
@@ -33,7 +33,6 @@ List<String> _parseAvailableSlots(String responseBody) {
 
   return List<String>.from(parsed);
 }
-
 
 class TimeSlotSelection extends ConsumerWidget {
   const TimeSlotSelection(this.fieldsProvider, {Key? key}) : super(key: key);
@@ -59,21 +58,22 @@ class TimeSlotSelection extends ConsumerWidget {
             } else if (snapshot.hasData) {
               List<String> timeSlots = snapshot.data!;
               return DropdownButtonFormField(
-                value: fields['timeSlot'],
-                disabledHint: fields['tutor'] != null && fields['date'] != null
-                    ? const Text('Nessuna fascia oraria disponibile')
-                    : null,
-                items: timeSlots.map((timeSlot) {
-                  return DropdownMenuItem<String>(
-                    value: timeSlot,
-                    child: Text(timeSlot),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  ref.read(fieldsProvider.notifier).setTime(value!);
-                },
-                menuMaxHeight: 200.0
-              );
+                  value: fields['timeSlot'],
+                  disabledHint:
+                      fields['tutor'] != null && fields['date'] != null
+                          ? const Text('Nessuna fascia oraria disponibile',
+                              overflow: TextOverflow.fade)
+                          : null,
+                  items: timeSlots.map((timeSlot) {
+                    return DropdownMenuItem<String>(
+                      value: timeSlot,
+                      child: Text(timeSlot),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    ref.read(fieldsProvider.notifier).setTime(value!);
+                  },
+                  menuMaxHeight: 200.0);
             } else {
               return const LinearProgressIndicator();
             }
