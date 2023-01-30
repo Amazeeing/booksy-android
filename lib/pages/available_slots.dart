@@ -18,7 +18,7 @@ Future<List<Docente>> _fetchAvailableTutors() async {
       'localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
     'username': username,
     'password': password,
-    'action': 'ottieniDocentiLiberi'
+    'action': 'ottieniDocenti'
   }));
 
   return _parseTutors(response.body);
@@ -30,14 +30,11 @@ List<Docente> _parseTutors(String responseBody) {
   return parsed.map<Docente>((json) => Docente.fromJson(json)).toList();
 }
 
-Map<String, Map<String, List<String>>> _parseAvailableSlots(
-    String responseBody) {
-  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+Future<Map<String, List<String>>> _fetchTutorAvailableSlots(String? selected) async {
+  if (selected == null) {
+    return {};
+  }
 
-  return Map<String, Map<String, List<String>>>.from(parsed);
-}
-
-Future<Map<String, Map<String, List<String>>>> _fetchAvailableSlots() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? username = prefs.getString('username');
   String? password = prefs.getString('password');
@@ -46,12 +43,23 @@ Future<Map<String, Map<String, List<String>>>> _fetchAvailableSlots() async {
       .get(Uri.http('localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
     'username': username,
     'password': password,
-    'action': 'ottieniSlotDisponibili',
+    'action': 'ottieniSlotDisponibiliDocente',
+    'docente': selected,
     'dataInizio': '13/02/2023',
     'dataFine': '17/02/2023'
   }));
 
-  return _parseAvailableSlots(response.body);
+  return _parseTutorAvailableSlots(response.body);
+}
+
+Map<String, List<String>> _parseTutorAvailableSlots(String responseBody) {
+  final Map<String, dynamic> parsed =
+      jsonDecode(responseBody) as Map<String, dynamic>;
+
+  Map<String, List<String>> tutorAvailableSlots =
+      parsed.map((key, value) => MapEntry(key, List<String>.from(value)));
+
+  return tutorAvailableSlots;
 }
 
 class AvailableSlotsPage extends StatefulWidget {
@@ -66,14 +74,14 @@ class AvailableSlotsPage extends StatefulWidget {
 class _AvailableSlotsPageState extends State<AvailableSlotsPage> {
   String? selected;
 
-  List<SlotDisponibile> _buildAvailableSlotsList(String? tutor, Map<String, List<String>> slots) {
+  List<SlotDisponibile> _buildAvailableSlotsList(
+      String? tutor, Map<String, List<String>> slots) {
     List<SlotDisponibile> availableSlots = [];
 
     for (var slot in slots.entries) {
       for (var timeSlot in slot.value) {
         availableSlots.add(SlotDisponibile(
-            docente: tutor!, data: slot.key, fasciaOraria: timeSlot)
-        );
+            docente: tutor!, data: slot.key, fasciaOraria: timeSlot));
       }
     }
 
@@ -98,11 +106,7 @@ class _AvailableSlotsPageState extends State<AvailableSlotsPage> {
                   children: [
                     const Text('Docente:'),
                     const SizedBox(width: 10.0),
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(
-                          maxWidth: 500.0,
-                          maxHeight: 50.0
-                      ),
+                    Expanded(
                       child: DropdownButtonFormField<String>(
                         items: tutors.map((docente) {
                           return DropdownMenuItem<String>(
@@ -129,31 +133,31 @@ class _AvailableSlotsPageState extends State<AvailableSlotsPage> {
         const SizedBox(height: 10.0),
         Expanded(
           child: Center(
-              child: FutureBuilder<Map<String, Map<String, List<String>>>>(
-                future: _fetchAvailableSlots(),
-                builder: (context, snapshot) {
-                  if(snapshot.hasError) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.question_mark_sharp, size: 80),
-                        SizedBox(height: 10.0),
-                        Text(
-                          'Impossibile reperire le ripetizioni disponibili.\nRiprova più tardi.',
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    );
-                  } else if(snapshot.hasData) {
-                    List<SlotDisponibile> tutorAvailableSlots = _buildAvailableSlotsList(selected, snapshot.data![selected]!);
-                    return SlotList(tutorAvailableSlots);
-                  } else {
-                    return const CircularProgressIndicator();
-                  }
-                },
-              )
-          ),
+              child: FutureBuilder<Map<String, List<String>>>(
+            future: _fetchTutorAvailableSlots(selected),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.question_mark_sharp, size: 80),
+                    SizedBox(height: 10.0),
+                    Text(
+                      'Impossibile reperire le ripetizioni disponibili.\nRiprova più tardi.',
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                );
+              } else if (snapshot.hasData) {
+                List<SlotDisponibile> tutorAvailableSlots =
+                    _buildAvailableSlotsList(selected, snapshot.data!);
+                return SlotList(tutorAvailableSlots, widget.user.ruolo == 'amministratore');
+              } else {
+                return const CircularProgressIndicator();
+              }
+            },
+          )),
         )
       ],
     );
