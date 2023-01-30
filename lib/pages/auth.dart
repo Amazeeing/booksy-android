@@ -58,7 +58,7 @@ class _AuthPageState extends State<AuthPage> {
       body: FutureBuilder<Utente?>(
         future: _authenticateUser(),
         builder: (context, snapshot) {
-          if(snapshot.hasError || snapshot.data == null) {
+          if(snapshot.hasError) {
             String? loginError = (snapshot.data != null) ? snapshot.error.toString() : null;
             return LoginPage(error: loginError);
           } else if(snapshot.hasData) {
