@@ -71,8 +71,22 @@ class _AppointmentCardState extends State<AppointmentCard> {
       return IconButton(
           icon: const Icon(Icons.close, color: Colors.red),
           onPressed: () => setState(() {
-            widget.current.setCancelled();
-          })
+            try {
+              widget.current.setCancelled();
+            } catch (e) {
+              showDialog(
+                  context: context,
+                  builder: (context) => const AlertDialog(
+                    icon: Icon(Icons.warning_amber),
+                    title: Text('Errore'),
+                    content: Text(
+                        'Si e\' verificato un errore durante l\'effettuazione della prenotazione'
+                    ),
+                  )
+              );
+            }
+          }),
+        tooltip: 'Annulla',
       );
     }
 
