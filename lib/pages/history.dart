@@ -50,7 +50,7 @@ class HistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(children: [
       const Text(
-        '🕖 Storico delle prenotazioni',
+        '🕖 Storico prenotazioni',
         textScaleFactor: 1.5,
       ),
       const SizedBox(height: 20.0),
