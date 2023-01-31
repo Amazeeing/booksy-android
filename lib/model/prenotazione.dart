@@ -81,7 +81,7 @@ class Prenotazione {
         'localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
           'username': username,
       'password': password,
-      'action': 'rimuoviPrenoazione',
+      'action': 'rimuoviPrenotazione',
       'idCorso': corso,
       'emailDocente': docente,
       'data': data,
