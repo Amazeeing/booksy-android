@@ -30,8 +30,8 @@ List<Docente> _parseTutors(String responseBody) {
   return parsed.map<Docente>((json) => Docente.fromJson(json)).toList();
 }
 
-Future<Map<String, List<String>>> _fetchTutorAvailableSlots(String? selected) async {
-  if (selected == null) {
+Future<Map<String, List<String>>> _fetchTutorAvailableSlots(String? tutor, String? date) async {
+  if (tutor == null) {
     return {};
   }
 
@@ -44,9 +44,9 @@ Future<Map<String, List<String>>> _fetchTutorAvailableSlots(String? selected) as
     'username': username,
     'password': password,
     'action': 'ottieniSlotDisponibiliDocente',
-    'docente': selected,
-    'dataInizio': '13/02/2023',
-    'dataFine': '17/02/2023'
+    'docente': tutor,
+    'dataInizio': date ?? '13/02/2023',
+    'dataFine': date ?? '17/02/2023'
   }));
 
   return _parseTutorAvailableSlots(response.body);
@@ -72,7 +72,7 @@ class AvailableSlotsPage extends StatefulWidget {
 }
 
 class _AvailableSlotsPageState extends State<AvailableSlotsPage> {
-  String? selected;
+  String? selectedTutor, selectedDate;
 
   List<SlotDisponibile> _buildAvailableSlotsList(
       String? tutor, Map<String, List<String>> slots) {
@@ -86,6 +86,10 @@ class _AvailableSlotsPageState extends State<AvailableSlotsPage> {
     }
 
     return availableSlots;
+  }
+
+  String _parseDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 
   @override
@@ -116,12 +120,12 @@ class _AvailableSlotsPageState extends State<AvailableSlotsPage> {
                         }).toList(),
                         onChanged: (value) {
                           setState(() {
-                            selected = value;
+                            selectedTutor = value;
                           });
                         },
                         menuMaxHeight: 200.0,
                       ),
-                    )
+                    ),
                   ],
                 );
               } else {
@@ -129,34 +133,70 @@ class _AvailableSlotsPageState extends State<AvailableSlotsPage> {
               }
             }),
         const SizedBox(height: 10.0),
+        Row(
+          children: [
+            const Text('Data:'),
+            const SizedBox(width: 10.0),
+            Expanded(
+              child: TextFormField(
+                controller: TextEditingController(text: selectedDate),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Selezionare una data.';
+                  }
+
+                  return null;
+                },
+                onTap: () async {
+                  DateTime today = DateTime.now();
+                  DateTime? selected = await showDatePicker(
+                      context: context,
+                      initialDate: today,
+                      firstDate: today,
+                      lastDate: today.add(const Duration(days: 7)));
+
+                  if (selected != null) {
+                    String parsedDate = _parseDate(selected);
+                    setState(() {
+                      selectedDate = parsedDate;
+                    });
+                  }
+                },
+                decoration:
+                    const InputDecoration(suffixIcon: Icon(Icons.calendar_month)),
+              ),
+            )
+          ],
+        ),
         const Divider(thickness: 2.0),
         const SizedBox(height: 10.0),
         Expanded(
           child: Center(
               child: FutureBuilder<Map<String, List<String>>>(
-            future: _fetchTutorAvailableSlots(selected),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.question_mark_sharp, size: 80),
-                    SizedBox(height: 10.0),
-                    Text(
-                      'Impossibile reperire le ripetizioni disponibili.\nRiprova più tardi.',
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                );
-              } else if (snapshot.hasData) {
-                List<SlotDisponibile> tutorAvailableSlots =
-                    _buildAvailableSlotsList(selected, snapshot.data!);
-                return SlotList(tutorAvailableSlots, widget.user.ruolo == 'amministratore');
-              } else {
-                return const CircularProgressIndicator();
-              }
-            },
+                future: _fetchTutorAvailableSlots(selectedTutor, selectedDate),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center, 
+                      crossAxisAlignment: CrossAxisAlignment.center, 
+                      children: const [
+                        Icon(Icons.question_mark_sharp, size: 80), 
+                        SizedBox(height: 10.0), 
+                        Text(
+                          'Impossibile reperire le ripetizioni disponibili.\nRiprova più tardi.', 
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    );
+                  } else if (snapshot.hasData) {
+                    List<SlotDisponibile> tutorAvailableSlots =
+                    _buildAvailableSlotsList(selectedTutor, snapshot.data!);
+                    return SlotList(
+                        tutorAvailableSlots, widget.user.ruolo == 'amministratore');
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
+                  },
           )),
         )
       ],
