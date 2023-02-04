@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:prenotazioni/model/utente.dart';
 import 'package:prenotazioni/model/docente.dart';
+import 'package:prenotazioni/model/corso.dart';
 import 'package:prenotazioni/model/slot_disponibile.dart';
 import 'package:prenotazioni/util/slot_list.dart';
 
@@ -15,14 +16,13 @@ final courseFilterProvider = StateProvider<String?>((ref) => null);
 
 final availableSlotsProvider =
     FutureProvider<List<SlotDisponibile>>((ref) async {
-  String? tutorFilter, dateFilter, courseFilter;
+  String? tutorFilter, dateFilter;
 
   tutorFilter = ref.watch(tutorFilterProvider);
   dateFilter = ref.watch(dateFilterProvider);
-  courseFilter = ref.watch(courseFilterProvider);
 
   Map<String, List<String>> availableSlots =
-      await _fetchTutorAvailableSlots(tutorFilter, dateFilter, courseFilter);
+      await _fetchTutorAvailableSlots(tutorFilter, dateFilter);
 
   return _buildAvailableSlotsList(tutorFilter, availableSlots);
 });
@@ -42,7 +42,7 @@ List<SlotDisponibile> _buildAvailableSlotsList(
 }
 
 Future<Map<String, List<String>>> _fetchTutorAvailableSlots(
-    String? tutor, String? date, String? course) async {
+    String? tutor, String? date) async {
   if (tutor == null) {
     return {};
   }
@@ -55,11 +55,8 @@ Future<Map<String, List<String>>> _fetchTutorAvailableSlots(
       .get(Uri.http('localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
     'username': username,
     'password': password,
-    'action': course != null
-        ? 'ottieniSlotDisponibiliCorso'
-        : 'ottieniSlotDisponibiliDocente',
+    'action': 'ottieniSlotDisponibiliDocente',
     'docente': tutor,
-    'corso': course,
     'dataInizio': date ?? '13/02/2023',
     'dataFine': date ?? '17/02/2023'
   }));
@@ -80,7 +77,7 @@ Map<String, List<String>> _parseTutorAvailableSlots(String responseBody) {
 class TutorFilter extends ConsumerWidget {
   const TutorFilter({Key? key}) : super(key: key);
 
-  Future<List<Docente>> _fetchAvailableTutors() async {
+  Future<List<Docente>> _fetchAvailableTutors(String? course) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? username = prefs.getString('username');
     String? password = prefs.getString('password');
@@ -90,7 +87,8 @@ class TutorFilter extends ConsumerWidget {
         'localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
       'username': username,
       'password': password,
-      'action': 'ottieniDocenti'
+      'action': course != null ? 'filtraDocentePerCorso' : 'ottieniDocenti',
+      'corso': course
     }));
 
     return _parseTutors(response.body);
@@ -105,13 +103,15 @@ class TutorFilter extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     String? chosenTutor = ref.watch(tutorFilterProvider);
+    String? chosenCourse = ref.watch(courseFilterProvider);
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Docente: '),
         const SizedBox(height: 10.0),
         FutureBuilder<List<Docente>>(
-            future: _fetchAvailableTutors(),
+            future: _fetchAvailableTutors(chosenCourse),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return const Text('Impossibile reperire i docenti.');
@@ -151,6 +151,7 @@ class DateFilter extends ConsumerWidget {
     String? chosenDate = ref.watch(dateFilterProvider);
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Data:'),
         const SizedBox(height: 10.0),
@@ -184,6 +185,67 @@ class DateFilter extends ConsumerWidget {
   }
 }
 
+class CourseFilter extends ConsumerWidget {
+  const CourseFilter({Key? key}) : super(key: key);
+
+  Future<List<Corso>> _fetchCourses() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? username = prefs.getString('username');
+    String? password = prefs.getString('password');
+
+    /* Autentico l'utente per poter rinnovare la sessione */
+    final response = await http.get(Uri.http(
+        'localhost:8080',
+        'progetto_TWeb_war_exploded/mobile',
+        {'username': username, 'password': password, 'action': 'ottieniCorsiAttivi'}));
+    return _parseCourses(response.body);
+  }
+
+  List<Corso> _parseCourses(String responseBody) {
+    final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+
+    return parsed.map<Corso>((json) => Corso.fromJson(json)).toList();
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    String? chosenCourse = ref.watch(courseFilterProvider);
+
+    return FutureBuilder<List<Corso>>(
+      future: _fetchCourses(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const Text('Impossibile reperire i corsi');
+        } else if (snapshot.hasData) {
+          List<Corso> courses = snapshot.data!;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Corso:'),
+              const SizedBox(height: 10.0),
+              DropdownButtonFormField<String>(
+                value: chosenCourse,
+                items: courses.map((corso) {
+                  return DropdownMenuItem<String>(
+                    value: corso.nome,
+                    child: Text(corso.nome),
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                  ref.read(tutorFilterProvider.notifier).state = null;
+                  ref.read(courseFilterProvider.notifier).state = value;
+                },
+              ),
+            ],
+          );
+        } else {
+          return const LinearProgressIndicator();
+        }
+      },
+    );
+  }
+}
+
 class FiltersPopUp extends ConsumerWidget {
   const FiltersPopUp({Key? key}) : super(key: key);
 
@@ -194,7 +256,6 @@ class FiltersPopUp extends ConsumerWidget {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Filtri', textScaleFactor: 1.5),
             const SizedBox(height: 10.0),
@@ -204,8 +265,10 @@ class FiltersPopUp extends ConsumerWidget {
             const SizedBox(height: 20.0),
             const DateFilter(),
             const SizedBox(height: 20.0),
+            const CourseFilter(),
+            const SizedBox(height: 20.0),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 TextButton(
                   child: const Text('PULISCI'),
@@ -215,6 +278,7 @@ class FiltersPopUp extends ConsumerWidget {
                     ref.read(dateFilterProvider.notifier).state = null;
                   },
                 ),
+                const SizedBox(width: 10.0),
                 TextButton(
                   child: const Text('CONFERMA'),
                   onPressed: () => Navigator.pop(context),
