@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,29 +9,40 @@ import 'package:prenotazioni/model/docente.dart';
 import 'package:prenotazioni/model/slot_disponibile.dart';
 import 'package:prenotazioni/util/slot_list.dart';
 
-Future<List<Docente>> _fetchAvailableTutors() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? username = prefs.getString('username');
-  String? password = prefs.getString('password');
+final tutorFilterProvider = StateProvider<String?>((ref) => null);
+final dateFilterProvider = StateProvider<String?>((ref) => null);
+final courseFilterProvider = StateProvider<String?>((ref) => null);
 
-  /* Autentico l'utente per poter rinnovare la sessione */
-  final response = await http.get(Uri.http(
-      'localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
-    'username': username,
-    'password': password,
-    'action': 'ottieniDocenti'
-  }));
+final availableSlotsProvider =
+    FutureProvider<List<SlotDisponibile>>((ref) async {
+  String? tutorFilter, dateFilter, courseFilter;
 
-  return _parseTutors(response.body);
+  tutorFilter = ref.watch(tutorFilterProvider);
+  dateFilter = ref.watch(dateFilterProvider);
+  courseFilter = ref.watch(courseFilterProvider);
+
+  Map<String, List<String>> availableSlots =
+      await _fetchTutorAvailableSlots(tutorFilter, dateFilter, courseFilter);
+
+  return _buildAvailableSlotsList(tutorFilter, availableSlots);
+});
+
+List<SlotDisponibile> _buildAvailableSlotsList(
+    String? tutor, Map<String, List<String>> slots) {
+  List<SlotDisponibile> availableSlots = [];
+
+  for (var slot in slots.entries) {
+    for (var timeSlot in slot.value) {
+      availableSlots.add(SlotDisponibile(
+          docente: tutor!, data: slot.key, fasciaOraria: timeSlot));
+    }
+  }
+
+  return availableSlots;
 }
 
-List<Docente> _parseTutors(String responseBody) {
-  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
-
-  return parsed.map<Docente>((json) => Docente.fromJson(json)).toList();
-}
-
-Future<Map<String, List<String>>> _fetchTutorAvailableSlots(String? tutor, String? date) async {
+Future<Map<String, List<String>>> _fetchTutorAvailableSlots(
+    String? tutor, String? date, String? course) async {
   if (tutor == null) {
     return {};
   }
@@ -43,8 +55,11 @@ Future<Map<String, List<String>>> _fetchTutorAvailableSlots(String? tutor, Strin
       .get(Uri.http('localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
     'username': username,
     'password': password,
-    'action': 'ottieniSlotDisponibiliDocente',
+    'action': course != null
+        ? 'ottieniSlotDisponibiliCorso'
+        : 'ottieniSlotDisponibiliDocente',
     'docente': tutor,
+    'corso': course,
     'dataInizio': date ?? '13/02/2023',
     'dataFine': date ?? '17/02/2023'
   }));
@@ -62,43 +77,39 @@ Map<String, List<String>> _parseTutorAvailableSlots(String responseBody) {
   return tutorAvailableSlots;
 }
 
-class AvailableSlotsPage extends StatefulWidget {
-  const AvailableSlotsPage(this.user, {Key? key}) : super(key: key);
+class TutorFilter extends ConsumerWidget {
+  const TutorFilter({Key? key}) : super(key: key);
 
-  final Utente user;
+  Future<List<Docente>> _fetchAvailableTutors() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? username = prefs.getString('username');
+    String? password = prefs.getString('password');
 
-  @override
-  State<AvailableSlotsPage> createState() => _AvailableSlotsPageState();
-}
+    /* Autentico l'utente per poter rinnovare la sessione */
+    final response = await http.get(Uri.http(
+        'localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
+      'username': username,
+      'password': password,
+      'action': 'ottieniDocenti'
+    }));
 
-class _AvailableSlotsPageState extends State<AvailableSlotsPage> {
-  String? selectedTutor, selectedDate;
-
-  List<SlotDisponibile> _buildAvailableSlotsList(
-      String? tutor, Map<String, List<String>> slots) {
-    List<SlotDisponibile> availableSlots = [];
-
-    for (var slot in slots.entries) {
-      for (var timeSlot in slot.value) {
-        availableSlots.add(SlotDisponibile(
-            docente: tutor!, data: slot.key, fasciaOraria: timeSlot));
-      }
-    }
-
-    return availableSlots;
+    return _parseTutors(response.body);
   }
 
-  String _parseDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+  List<Docente> _parseTutors(String responseBody) {
+    final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+
+    return parsed.map<Docente>((json) => Docente.fromJson(json)).toList();
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    String? chosenTutor = ref.watch(tutorFilterProvider);
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const Text('📅 Ripetizioni disponibili', textScaleFactor: 1.5),
-        const SizedBox(height: 20.0),
+        const Text('Docente: '),
+        const SizedBox(height: 10.0),
         FutureBuilder<List<Docente>>(
             future: _fetchAvailableTutors(),
             builder: (context, snapshot) {
@@ -106,97 +117,141 @@ class _AvailableSlotsPageState extends State<AvailableSlotsPage> {
                 return const Text('Impossibile reperire i docenti.');
               } else if (snapshot.hasData) {
                 List<Docente> tutors = snapshot.data!;
-                return Row(
-                  children: [
-                    const Text('Docente:'),
-                    const SizedBox(width: 10.0),
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        items: tutors.map((docente) {
-                          return DropdownMenuItem<String>(
-                            value: docente.email,
-                            child: Text('${docente.nome} ${docente.cognome}'),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedTutor = value;
-                          });
-                        },
-                        menuMaxHeight: 200.0,
-                      ),
-                    ),
-                  ],
+                return DropdownButtonFormField<String>(
+                  value: chosenTutor,
+                  items: tutors.map((docente) {
+                    return DropdownMenuItem<String>(
+                      value: docente.email,
+                      child: Text('${docente.nome} ${docente.cognome}'),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    ref.read(tutorFilterProvider.notifier).state = value;
+                  },
+                  menuMaxHeight: 200.0,
                 );
               } else {
                 return const LinearProgressIndicator();
               }
-            }),
+            })
+      ],
+    );
+  }
+}
+
+class DateFilter extends ConsumerWidget {
+  const DateFilter({Key? key}) : super(key: key);
+
+  String _parseDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    String? chosenDate = ref.watch(dateFilterProvider);
+
+    return Column(
+      children: [
+        const Text('Data:'),
         const SizedBox(height: 10.0),
-        Row(
+        TextFormField(
+          controller: TextEditingController(text: chosenDate),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Selezionare una data.';
+            }
+
+            return null;
+          },
+          onTap: () async {
+            DateTime today = DateTime.now();
+            DateTime? selected = await showDatePicker(
+                context: context,
+                initialDate: today,
+                firstDate: today,
+                lastDate: today.add(const Duration(days: 6)));
+
+            if (selected != null) {
+              String parsedDate = _parseDate(selected);
+              ref.read(dateFilterProvider.notifier).state = parsedDate;
+            }
+          },
+          decoration:
+              const InputDecoration(suffixIcon: Icon(Icons.calendar_month)),
+        )
+      ],
+    );
+  }
+}
+
+class FiltersPopUp extends StatelessWidget {
+  const FiltersPopUp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      insetPadding: const EdgeInsets.symmetric(vertical: 100.0, horizontal: 40.0),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Data:'),
-            const SizedBox(width: 10.0),
-            Expanded(
-              child: TextFormField(
-                controller: TextEditingController(text: selectedDate),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Selezionare una data.';
-                  }
-
-                  return null;
-                },
-                onTap: () async {
-                  DateTime today = DateTime.now();
-                  DateTime? selected = await showDatePicker(
-                      context: context,
-                      initialDate: today,
-                      firstDate: today,
-                      lastDate: today.add(const Duration(days: 7)));
-
-                  if (selected != null) {
-                    String parsedDate = _parseDate(selected);
-                    setState(() {
-                      selectedDate = parsedDate;
-                    });
-                  }
-                },
-                decoration:
-                    const InputDecoration(suffixIcon: Icon(Icons.calendar_month)),
+            const Text('Filtri', textScaleFactor: 1.5),
+            const SizedBox(height: 10.0),
+            const Divider(thickness: 2.0),
+            const SizedBox(height: 10.0),
+            const TutorFilter(),
+            const SizedBox(height: 20.0),
+            const DateFilter(),
+            const SizedBox(height: 20.0),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: TextButton(
+                child: const Text('OK'),
+                onPressed: () => Navigator.pop(context),
               ),
             )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class AvailableSlotsPage extends ConsumerWidget {
+  const AvailableSlotsPage(this.user, {Key? key}) : super(key: key);
+
+  final Utente user;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    AsyncValue<List<SlotDisponibile>> availableSlotsListing =
+        ref.watch(availableSlotsProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Text('📅 Ripetizioni disponibili', textScaleFactor: 1.5),
+        const SizedBox(height: 20.0),
+        TextButton.icon(
+          icon: const Icon(Icons.filter_alt_outlined),
+          label: const Text('Filtri'),
+          onPressed: () => showDialog(
+            context: context,
+            builder: (context) => const FiltersPopUp(),
+          ),
+        ),
+        const SizedBox(height: 10.0),
         const Divider(thickness: 2.0),
         const SizedBox(height: 10.0),
         Expanded(
           child: Center(
-              child: FutureBuilder<Map<String, List<String>>>(
-                future: _fetchTutorAvailableSlots(selectedTutor, selectedDate),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center, 
-                      crossAxisAlignment: CrossAxisAlignment.center, 
-                      children: const [
-                        Icon(Icons.question_mark_sharp, size: 80), 
-                        SizedBox(height: 10.0), 
-                        Text(
-                          'Impossibile reperire le ripetizioni disponibili.\nRiprova più tardi.', 
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    );
-                  } else if (snapshot.hasData) {
-                    List<SlotDisponibile> tutorAvailableSlots =
-                    _buildAvailableSlotsList(selectedTutor, snapshot.data!);
-                    return SlotList(
-                        tutorAvailableSlots, widget.user.ruolo == 'amministratore');
-                  } else {
-                    return const CircularProgressIndicator();
-                  }
-                  },
+              child: availableSlotsListing.when(
+            data: (slots) => SlotList(slots, user.ruolo == 'amministratore'),
+            error: (error, stackTrace) => const Text(
+              'Impossibile reperire gli slot disponibili per i parametri selezionati.\nSeleziona Filtri per modificarli.',
+            ),
+            loading: () => const CircularProgressIndicator(),
           )),
         )
       ],
