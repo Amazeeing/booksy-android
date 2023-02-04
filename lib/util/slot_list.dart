@@ -73,7 +73,7 @@ class SlotList extends StatelessWidget {
       },
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 350.0,
-          childAspectRatio: 3.0 / 1.0,
+          childAspectRatio: 3.0 / 1.5,
           mainAxisSpacing: 20.0,
           crossAxisSpacing: 20.0),
     );
