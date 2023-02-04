@@ -73,7 +73,8 @@ class _LoginFormState extends State<LoginForm> {
           TextButton(
               onPressed: () => {Navigator.pushNamed(context, '/register')},
               child: const Text('Registrati')),
-          Text((widget.error != null) ? widget.error! : '')
+          const SizedBox(height: 10.0),
+          Text((widget.error != null) ? widget.error!.replaceAll('Exception: ', '') : '')
         ],
       ),
     );
