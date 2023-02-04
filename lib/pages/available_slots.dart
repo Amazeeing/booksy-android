@@ -184,13 +184,13 @@ class DateFilter extends ConsumerWidget {
   }
 }
 
-class FiltersPopUp extends StatelessWidget {
+class FiltersPopUp extends ConsumerWidget {
   const FiltersPopUp({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Dialog(
-      insetPadding: const EdgeInsets.symmetric(vertical: 100.0, horizontal: 40.0),
+      insetPadding: const EdgeInsets.symmetric(vertical: 200.0, horizontal: 50.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -204,12 +204,22 @@ class FiltersPopUp extends StatelessWidget {
             const SizedBox(height: 20.0),
             const DateFilter(),
             const SizedBox(height: 20.0),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: TextButton(
-                child: const Text('OK'),
-                onPressed: () => Navigator.pop(context),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton(
+                  child: const Text('PULISCI'),
+                  onPressed: () {
+                    ref.read(tutorFilterProvider.notifier).state = null;
+                    ref.read(dateFilterProvider.notifier).state = null;
+                    ref.read(dateFilterProvider.notifier).state = null;
+                  },
+                ),
+                TextButton(
+                  child: const Text('CONFERMA'),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
             )
           ],
         ),
