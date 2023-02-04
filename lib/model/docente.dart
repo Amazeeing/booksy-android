@@ -24,4 +24,18 @@ class Docente {
   String toString() {
     return 'Docente{email: $email, nome: $nome, cognome: $cognome, attivo: $attivo}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Docente &&
+          runtimeType == other.runtimeType &&
+          email == other.email &&
+          nome == other.nome &&
+          cognome == other.cognome &&
+          attivo == other.attivo;
+
+  @override
+  int get hashCode =>
+      email.hashCode ^ nome.hashCode ^ cognome.hashCode ^ attivo.hashCode;
 }
