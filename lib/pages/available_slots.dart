@@ -10,31 +10,36 @@ import 'package:prenotazioni/model/corso.dart';
 import 'package:prenotazioni/model/slot_disponibile.dart';
 import 'package:prenotazioni/util/slot_list.dart';
 
-final tutorFilterProvider = StateProvider<String?>((ref) => null);
+final tutorFilterProvider = StateProvider<Docente?>((ref) => null);
 final dateFilterProvider = StateProvider<String?>((ref) => null);
 final courseFilterProvider = StateProvider<String?>((ref) => null);
 
 final availableSlotsProvider =
     FutureProvider<List<SlotDisponibile>>((ref) async {
-  String? tutorFilter, dateFilter;
+  Docente? tutorFilter;
+  String? dateFilter;
 
   tutorFilter = ref.watch(tutorFilterProvider);
   dateFilter = ref.watch(dateFilterProvider);
 
-  Map<String, List<String>> availableSlots =
-      await _fetchTutorAvailableSlots(tutorFilter, dateFilter);
+  if(tutorFilter == null) {
+    return [];
+  } else {
+    Map<String, List<String>> availableSlots =
+    await _fetchTutorAvailableSlots(tutorFilter.email, dateFilter);
 
-  return _buildAvailableSlotsList(tutorFilter, availableSlots);
+    return _buildAvailableSlotsList('${tutorFilter.nome} ${tutorFilter.cognome}', availableSlots);
+  }
 });
 
 List<SlotDisponibile> _buildAvailableSlotsList(
-    String? tutor, Map<String, List<String>> slots) {
+    String tutor, Map<String, List<String>> slots) {
   List<SlotDisponibile> availableSlots = [];
 
   for (var slot in slots.entries) {
     for (var timeSlot in slot.value) {
       availableSlots.add(SlotDisponibile(
-          docente: tutor!, data: slot.key, fasciaOraria: timeSlot));
+          docente: tutor, data: slot.key, fasciaOraria: timeSlot));
     }
   }
 
@@ -42,10 +47,7 @@ List<SlotDisponibile> _buildAvailableSlotsList(
 }
 
 Future<Map<String, List<String>>> _fetchTutorAvailableSlots(
-    String? tutor, String? date) async {
-  if (tutor == null) {
-    return {};
-  }
+    String tutor, String? date) async {
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? username = prefs.getString('username');
@@ -102,7 +104,7 @@ class TutorFilter extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    String? chosenTutor = ref.watch(tutorFilterProvider);
+    Docente? chosenTutor = ref.watch(tutorFilterProvider);
     String? chosenCourse = ref.watch(courseFilterProvider);
 
     return Column(
@@ -117,11 +119,11 @@ class TutorFilter extends ConsumerWidget {
                 return const Text('Impossibile reperire i docenti.');
               } else if (snapshot.hasData) {
                 List<Docente> tutors = snapshot.data!;
-                return DropdownButtonFormField<String>(
+                return DropdownButtonFormField<Docente>(
                   value: chosenTutor,
                   items: tutors.map((docente) {
-                    return DropdownMenuItem<String>(
-                      value: docente.email,
+                    return DropdownMenuItem<Docente>(
+                      value: docente,
                       child: Text('${docente.nome} ${docente.cognome}'),
                     );
                   }).toList(),
@@ -252,9 +254,9 @@ class FiltersPopUp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Dialog(
-      insetPadding: const EdgeInsets.symmetric(vertical: 200.0, horizontal: 50.0),
+      insetPadding: const EdgeInsets.symmetric(vertical: 180.0, horizontal: 40.0),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
             const Text('Filtri', textScaleFactor: 1.5),
@@ -266,16 +268,16 @@ class FiltersPopUp extends ConsumerWidget {
             const DateFilter(),
             const SizedBox(height: 20.0),
             const CourseFilter(),
-            const SizedBox(height: 20.0),
+            const SizedBox(height: 40.0),
             Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
                   child: const Text('PULISCI'),
                   onPressed: () {
                     ref.read(tutorFilterProvider.notifier).state = null;
                     ref.read(dateFilterProvider.notifier).state = null;
-                    ref.read(dateFilterProvider.notifier).state = null;
+                    ref.read(courseFilterProvider.notifier).state = null;
                   },
                 ),
                 const SizedBox(width: 10.0),
