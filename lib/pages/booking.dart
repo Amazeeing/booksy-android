@@ -60,36 +60,38 @@ class BookingPage extends ConsumerWidget {
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        CourseSelection(provider),
-                        TutorSelection(provider),
-                        DateSelection(provider),
-                        TimeSlotSelection(provider),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            OutlinedButton(
-                                onPressed: () {
-                                  ref.read(provider.notifier).clear();
-                                  Navigator.pushReplacementNamed(context, '/');
-                                },
-                                child: const Text('Annulla')),
-                            ElevatedButton(
-                                onPressed: () {
-                                  if (_bookingFormKey.currentState!
-                                      .validate()) {
-                                    _addAppointment(ref.read(provider));
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CourseSelection(provider),
+                          TutorSelection(provider),
+                          DateSelection(provider),
+                          TimeSlotSelection(provider),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              OutlinedButton(
+                                  onPressed: () {
                                     ref.read(provider.notifier).clear();
-                                    Navigator.pushReplacementNamed(
-                                        context, '/');
-                                  }
-                                },
-                                child: const Text('Prenota'))
-                          ],
-                        )
-                      ],
+                                    Navigator.pushReplacementNamed(context, '/');
+                                  },
+                                  child: const Text('Annulla')),
+                              ElevatedButton(
+                                  onPressed: () {
+                                    if (_bookingFormKey.currentState!
+                                        .validate()) {
+                                      _addAppointment(ref.read(provider));
+                                      ref.read(provider.notifier).clear();
+                                      Navigator.pushReplacementNamed(
+                                          context, '/');
+                                    }
+                                  },
+                                  child: const Text('Prenota'))
+                            ],
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 )

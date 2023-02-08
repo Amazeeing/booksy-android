@@ -257,33 +257,35 @@ class FiltersPopUp extends ConsumerWidget {
       insetPadding: const EdgeInsets.symmetric(vertical: 150.0, horizontal: 50.0),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text('Filtri', textScaleFactor: 1.5),
-            const Divider(thickness: 2.0),
-            const TutorFilter(),
-            const DateFilter(),
-            const CourseFilter(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  child: const Text('PULISCI'),
-                  onPressed: () {
-                    ref.read(tutorFilterProvider.notifier).state = null;
-                    ref.read(dateFilterProvider.notifier).state = null;
-                    ref.read(courseFilterProvider.notifier).state = null;
-                  },
-                ),
-                const SizedBox(width: 10.0),
-                TextButton(
-                  child: const Text('CONFERMA'),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            )
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Filtri', textScaleFactor: 1.5),
+              const Divider(thickness: 2.0),
+              const TutorFilter(),
+              const DateFilter(),
+              const CourseFilter(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    child: const Text('PULISCI'),
+                    onPressed: () {
+                      ref.read(tutorFilterProvider.notifier).state = null;
+                      ref.read(dateFilterProvider.notifier).state = null;
+                      ref.read(courseFilterProvider.notifier).state = null;
+                    },
+                  ),
+                  const SizedBox(width: 10.0),
+                  TextButton(
+                    child: const Text('CONFERMA'),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
