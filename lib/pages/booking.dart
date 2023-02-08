@@ -58,20 +58,21 @@ class BookingPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 30.0),
                 Card(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(30.0),
-                      child: Column(
-                        children: [
-                          CourseSelection(provider),
-                          const SizedBox(height: 20.0),
-                          TutorSelection(provider),
-                          const SizedBox(height: 20.0),
-                          DateSelection(provider),
-                          const SizedBox(height: 20.0),
-                          TimeSlotSelection(provider),
-                          const SizedBox(height: 30.0),
-                          Row(
+                  child: Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CourseSelection(provider),
+                        const SizedBox(height: 20.0),
+                        TutorSelection(provider),
+                        const SizedBox(height: 20.0),
+                        DateSelection(provider),
+                        const SizedBox(height: 20.0),
+                        TimeSlotSelection(provider),
+                        const SizedBox(height: 30.0),
+                        Expanded(
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               OutlinedButton(
@@ -93,9 +94,9 @@ class BookingPage extends ConsumerWidget {
                                   },
                                   child: const Text('Prenota'))
                             ],
-                          )
-                        ],
-                      ),
+                          ),
+                        )
+                      ],
                     ),
                   ),
                 )

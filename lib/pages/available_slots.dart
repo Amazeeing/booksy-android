@@ -220,27 +220,25 @@ class CourseFilter extends ConsumerWidget {
           return const Text('Impossibile reperire i corsi');
         } else if (snapshot.hasData) {
           List<Corso> courses = snapshot.data!;
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Corso:'),
-                const SizedBox(height: 10.0),
-                DropdownButtonFormField<String>(
-                  value: chosenCourse,
-                  items: courses.map((corso) {
-                    return DropdownMenuItem<String>(
-                      value: corso.nome,
-                      child: Text(corso.nome),
-                    );
-                  }).toList(),
-                  onChanged: (String? value) {
-                    ref.read(tutorFilterProvider.notifier).state = null;
-                    ref.read(courseFilterProvider.notifier).state = value;
-                  },
-                ),
-              ],
-            ),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Corso:'),
+              const SizedBox(height: 10.0),
+              DropdownButtonFormField<String>(
+                value: chosenCourse,
+                items: courses.map((corso) {
+                  return DropdownMenuItem<String>(
+                    value: corso.nome,
+                    child: Text(corso.nome),
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                  ref.read(tutorFilterProvider.notifier).state = null;
+                  ref.read(courseFilterProvider.notifier).state = value;
+                },
+              ),
+            ],
           );
         } else {
           return const LinearProgressIndicator();
@@ -271,23 +269,25 @@ class FiltersPopUp extends ConsumerWidget {
             const SizedBox(height: 20.0),
             const CourseFilter(),
             const SizedBox(height: 40.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  child: const Text('PULISCI'),
-                  onPressed: () {
-                    ref.read(tutorFilterProvider.notifier).state = null;
-                    ref.read(dateFilterProvider.notifier).state = null;
-                    ref.read(courseFilterProvider.notifier).state = null;
-                  },
-                ),
-                const SizedBox(width: 10.0),
-                TextButton(
-                  child: const Text('CONFERMA'),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    child: const Text('PULISCI'),
+                    onPressed: () {
+                      ref.read(tutorFilterProvider.notifier).state = null;
+                      ref.read(dateFilterProvider.notifier).state = null;
+                      ref.read(courseFilterProvider.notifier).state = null;
+                    },
+                  ),
+                  const SizedBox(width: 10.0),
+                  TextButton(
+                    child: const Text('CONFERMA'),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
             )
           ],
         ),
