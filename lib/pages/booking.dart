@@ -50,50 +50,52 @@ class BookingPage extends ConsumerWidget {
           minimum: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 50.0),
           child: Form(
             key: _bookingFormKey,
-            child: Column(
-              children: [
-                const Text(
-                  'Prenota una ripetizione',
-                  textScaleFactor: 1.5,
-                ),
-                const SizedBox(height: 30.0),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        CourseSelection(provider),
-                        TutorSelection(provider),
-                        DateSelection(provider),
-                        TimeSlotSelection(provider),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            OutlinedButton(
-                                onPressed: () {
-                                  ref.read(provider.notifier).clear();
-                                  Navigator.pushReplacementNamed(context, '/');
-                                },
-                                child: const Text('Annulla')),
-                            ElevatedButton(
-                                onPressed: () {
-                                  if (_bookingFormKey.currentState!
-                                      .validate()) {
-                                    _addAppointment(ref.read(provider));
-                                    ref.read(provider.notifier).clear();
-                                    Navigator.pushReplacementNamed(
-                                        context, '/');
-                                  }
-                                },
-                                child: const Text('Prenota'))
-                          ],
-                        )
-                      ],
-                    ),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const Text(
+                    'Prenota una ripetizione',
+                    textScaleFactor: 1.5,
                   ),
-                )
-              ],
+                  const SizedBox(height: 30.0),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CourseSelection(provider),
+                          TutorSelection(provider),
+                          DateSelection(provider),
+                          TimeSlotSelection(provider),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              OutlinedButton(
+                                  onPressed: () {
+                                    ref.read(provider.notifier).clear();
+                                    Navigator.pushReplacementNamed(context, '/');
+                                  },
+                                  child: const Text('Annulla')),
+                              ElevatedButton(
+                                  onPressed: () {
+                                    if (_bookingFormKey.currentState!
+                                        .validate()) {
+                                      _addAppointment(ref.read(provider));
+                                      ref.read(provider.notifier).clear();
+                                      Navigator.pushReplacementNamed(
+                                          context, '/');
+                                    }
+                                  },
+                                  child: const Text('Prenota'))
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ));
