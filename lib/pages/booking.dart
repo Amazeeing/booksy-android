@@ -64,11 +64,11 @@ class BookingPage extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         CourseSelection(provider),
-                        const SizedBox(height: 20.0),
+                        const SizedBox(height: 15.0),
                         TutorSelection(provider),
-                        const SizedBox(height: 20.0),
+                        const SizedBox(height: 15.0),
                         DateSelection(provider),
-                        const SizedBox(height: 20.0),
+                        const SizedBox(height: 15.0),
                         TimeSlotSelection(provider),
                         const SizedBox(height: 30.0),
                         Expanded(
