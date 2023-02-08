@@ -17,7 +17,7 @@ Future<List<String>> _fetchAvailableSlots(String? tutor, String? date) async {
   String? password = prefs.getString('password');
 
   final response = await http
-      .get(Uri.http('localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
+      .get(Uri.http('10.0.2.2:8080', '/progetto_TWeb_war_exploded/mobile', {
     'username': username,
     'password': password,
     'action': 'ottieniSlotDisponibiliDocenteData',

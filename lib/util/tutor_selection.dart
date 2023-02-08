@@ -19,7 +19,7 @@ Future<List<Docente>> _fetchTutorsByCourse(String? name) async {
 
   /* Autentico l'utente per poter rinnovare la sessione */
   final response = await http
-      .get(Uri.http('localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
+      .get(Uri.http('10.0.2.2:8080', '/progetto_TWeb_war_exploded/mobile', {
     'username': username,
     'password': password,
     'action': 'filtraDocentePerCorso',
