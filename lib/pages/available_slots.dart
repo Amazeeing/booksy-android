@@ -262,10 +262,15 @@ class FiltersPopUp extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('Filtri', textScaleFactor: 1.5),
+              const SizedBox(height: 5.0),
               const Divider(thickness: 2.0),
+              const SizedBox(height: 5.0),
               const TutorFilter(),
+              const SizedBox(height: 5.0),
               const DateFilter(),
+              const SizedBox(height: 5.0),
               const CourseFilter(),
+              const SizedBox(height: 10.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
