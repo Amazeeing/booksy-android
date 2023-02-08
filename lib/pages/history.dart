@@ -23,7 +23,7 @@ Future<List<Prenotazione>> _fetchAppointments(String userRole) async {
   /* Ottengo le prenotazioni rilevanti al ruolo dell'utente */
   String appointmentsURL = _appointmentURL[userRole]!;
   final response = await http.get(Uri.http(
-      'localhost:8080', '/progetto_TWeb_war_exploded/mobile',
+      '10.0.2.2:8080', '/progetto_TWeb_war_exploded/mobile',
       {'username': username,
         'password': password,
         'action': appointmentsURL}));

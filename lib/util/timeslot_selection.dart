@@ -54,7 +54,7 @@ class TimeSlotSelection extends ConsumerWidget {
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return const Text(
-                  'Impossibile reperire le fascie orarie per il docente selezionato.');
+                  'Impossibile reperire le fascie orarie.');
             } else if (snapshot.hasData) {
               List<String> timeSlots = snapshot.data!;
               return DropdownButtonFormField(

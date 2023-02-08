@@ -21,7 +21,7 @@ Future<Utente?> _authenticateUser() async {
   final http.Response response;
   try {
     response = await http.post(Uri.http(
-        'localhost:8080', '/progetto_TWeb_war_exploded/autentica',
+        '10.0.2.2:8080', '/progetto_TWeb_war_exploded/autentica',
         {'action': 'autenticaUtente',
           'username': username,
           'password': password}));

@@ -54,7 +54,7 @@ class Prenotazione {
 
     /* Imposto la prenotazione come effettuata nel DB */
     await http.post(Uri.http(
-        'localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
+        '10.0.2.2:8080', '/progetto_TWeb_war_exploded/mobile', {
       'username': username,
       'password': password,
       'action': 'impostaPrenotazioneEffettuata',
@@ -78,7 +78,7 @@ class Prenotazione {
 
     /* Imposta la prenotazione come cancellata nel DB */
     await http.post(Uri.http(
-        'localhost:8080', '/progetto_TWeb_war_exploded/mobile', {
+        '10.0.2.2:8080', '/progetto_TWeb_war_exploded/mobile', {
           'username': username,
       'password': password,
       'action': 'rimuoviPrenotazione',

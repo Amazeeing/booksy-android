@@ -12,7 +12,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     WebViewController controller = WebViewController();
-    controller.loadRequest(Uri.http('localhost:8080', '/#/progetto_TWeb_war_exploded/register'));
+    controller.loadRequest(Uri.http('10.0.2.2:8080', '/#/progetto_TWeb_war_exploded/register'));
 
     return Scaffold(
       appBar: AppBar(

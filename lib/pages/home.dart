@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
     String? password = prefs.getString('password');
 
     await http.post(Uri.http(
-        'localhost:8080', 'progetto_TWeb_war_exploded/autentica', {
+        '10.0.2.2:8080', 'progetto_TWeb_war_exploded/autentica', {
       'username': username,
       'password': password,
       'action': 'scollegaUtente'
