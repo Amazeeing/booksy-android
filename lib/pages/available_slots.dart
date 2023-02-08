@@ -220,25 +220,27 @@ class CourseFilter extends ConsumerWidget {
           return const Text('Impossibile reperire i corsi');
         } else if (snapshot.hasData) {
           List<Corso> courses = snapshot.data!;
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Corso:'),
-              const SizedBox(height: 10.0),
-              DropdownButtonFormField<String>(
-                value: chosenCourse,
-                items: courses.map((corso) {
-                  return DropdownMenuItem<String>(
-                    value: corso.nome,
-                    child: Text(corso.nome),
-                  );
-                }).toList(),
-                onChanged: (String? value) {
-                  ref.read(tutorFilterProvider.notifier).state = null;
-                  ref.read(courseFilterProvider.notifier).state = value;
-                },
-              ),
-            ],
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Corso:'),
+                const SizedBox(height: 10.0),
+                DropdownButtonFormField<String>(
+                  value: chosenCourse,
+                  items: courses.map((corso) {
+                    return DropdownMenuItem<String>(
+                      value: corso.nome,
+                      child: Text(corso.nome),
+                    );
+                  }).toList(),
+                  onChanged: (String? value) {
+                    ref.read(tutorFilterProvider.notifier).state = null;
+                    ref.read(courseFilterProvider.notifier).state = value;
+                  },
+                ),
+              ],
+            ),
           );
         } else {
           return const LinearProgressIndicator();
