@@ -265,11 +265,11 @@ class FiltersPopUp extends ConsumerWidget {
               const SizedBox(height: 10.0),
               const Divider(thickness: 2.0),
               const SizedBox(height: 10.0),
-              const TutorFilter(),
+              const CourseFilter(),
               const SizedBox(height: 10.0),
               const DateFilter(),
               const SizedBox(height: 10.0),
-              const CourseFilter(),
+              const TutorFilter(),
               const SizedBox(height: 20.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
